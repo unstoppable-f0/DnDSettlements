@@ -1,20 +1,20 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
 
-app = FastAPI()
-# app.frontend('/', directory='frontend', fallback='index.html', check_dir=True)
-front = Jinja2Templates(directory='frontend')
+from backend.db.models import SessionDep, create_db_and_tables
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await create_db_and_tables()
+    yield
 
-@app.get("/", response_class=HTMLResponse)
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/")
 async def read_root(request: Request):
-    # return {"Hello": "World"}
-    return front.TemplateResponse(
-        request=request,
-        name='index.html'
-    )
+    return {"Hello": "World"}
 
 
 @app.get("/items/{item_id}")
