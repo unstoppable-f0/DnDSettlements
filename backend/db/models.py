@@ -10,10 +10,23 @@ class Campaign(SQLModel, table=True):
     name: str = Field(index=True, unique=True)
 
 
+class CreateCampaign(SQLModel):
+    name: str
+
+
 class Settlement(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)
     campaign: str = Field(foreign_key='campaign.name')
+
+
+class CreateSettlement(SQLModel):
+    name: str
+    campaign: str
+
+
+class GetSettlementsByCampaign(SQLModel):
+    campaign: str
 
 
 class Asset(SQLModel, table=True):
@@ -29,10 +42,20 @@ class Event(SQLModel, table=True):
     settlement_id: int | None = Field(foreign_key='settlement.id')
     name: str
     description: str
-    resolved: bool
+    resolved: bool = Field(default=False)
+
+
+class CreateEvent(SQLModel):
+    settlement_id: int
+    name: str
+    description: str
+    resolved: bool = Field(default=False)
 
 
 class EventResolution(SQLModel, table=True):
+
+    __tablename__ = 'event_resolution'
+
     id: int | None = Field(default=None, primary_key=True)
     event_id: int | None = Field(foreign_key='event.id')
     name: str
@@ -59,7 +82,8 @@ class Building(SQLModel, table=True):
 sqlite_file_name = Path().cwd().joinpath('backend').joinpath('db').joinpath('settlements.db')
 sqlite_url = f'sqlite:///{sqlite_file_name}'
 
-engine = create_engine(sqlite_url)
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, connect_args=connect_args)
 
 
 async def create_db_and_tables():
