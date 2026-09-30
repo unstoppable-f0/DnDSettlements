@@ -2,19 +2,22 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 from sqlmodel import select
-from backend.db.models import SessionDep, Event, CreateEvent
+
+from backend.db.models import CreateEvent, Event, SessionDep
+
+events_router = APIRouter(
+    prefix="/events",
+    tags=['events']
+)
 
 
-events_router = APIRouter()
-
-
-@events_router.get('/events/', response_model=list[Event])
+@events_router.get('/', response_model=list[Event])
 async def get_all_events(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100):
     all_events = session.exec(select(Event).offset(offset).limit(limit)).all()
     return all_events
 
 
-@events_router.get('/events/{settlement_id}', response_model=list[Event])
+@events_router.get('/{settlement_id}', response_model=list[Event])
 async def get_events_by_settlement_id(settlement_id: int,
                                       session: SessionDep,
                                       offset: int = 0,
@@ -28,7 +31,7 @@ async def get_events_by_settlement_id(settlement_id: int,
 
 
 
-@events_router.post('/events', response_model=Event)
+@events_router.post('/', response_model=Event)
 async def create_event(event: CreateEvent, session: SessionDep):
     db_event = Event.model_validate(event)
     session.add(db_event)

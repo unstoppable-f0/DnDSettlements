@@ -1,5 +1,5 @@
-from typing import Annotated, Unpack
 from pathlib import Path
+from typing import Annotated
 
 from fastapi import Depends
 from sqlmodel import Field, Session, SQLModel, create_engine, select
@@ -37,6 +37,13 @@ class Asset(SQLModel, table=True):
     defence: int
 
 
+class CreateAsset(SQLModel):
+    income: int
+    coffers: int
+    resources: int
+    defence: int
+
+
 class Event(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     settlement_id: int | None = Field(foreign_key='settlement.id')
@@ -67,8 +74,30 @@ class EventResolution(SQLModel, table=True):
     defence: int
 
 
+class CreateEventResolution(SQLModel):
+    event_id: int | None = Field(foreign_key='event.id')
+    name: str
+    description: str
+    chosen: bool
+    income: int
+    coffers: int
+    resources: int
+    defence: int
+
+
 class Building(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    settlement_id: int | None = Field(foreign_key='settlement.id')
+    name: str
+    description: str
+    is_built: bool
+    income: int
+    coffers: int
+    resources: int
+    defence: int
+
+
+class CreateBuilding(SQLModel):
     settlement_id: int | None = Field(foreign_key='settlement.id')
     name: str
     description: str
