@@ -10,7 +10,7 @@ class Campaign(SQLModel, table=True):
     name: str = Field(index=True, unique=True)
 
 
-class CreateCampaign(SQLModel):
+class CampaignNameUpdate(SQLModel):
     name: str
 
 
@@ -37,7 +37,7 @@ class Asset(SQLModel, table=True):
     defence: int
 
 
-class CreateAsset(SQLModel):
+class ChangeAsset(SQLModel):
     income: int
     coffers: int
     resources: int
@@ -67,7 +67,7 @@ class EventResolution(SQLModel, table=True):
     event_id: int | None = Field(foreign_key='event.id')
     name: str
     description: str
-    chosen: bool
+    chosen: bool = Field(default=False)
     income: int
     coffers: int
     resources: int
@@ -78,11 +78,15 @@ class CreateEventResolution(SQLModel):
     event_id: int | None = Field(foreign_key='event.id')
     name: str
     description: str
-    chosen: bool
+    chosen: bool = Field(default=False)
     income: int
     coffers: int
     resources: int
     defence: int
+
+
+class ChooseEventResolution(SQLModel):
+    chosen: bool
 
 
 class Building(SQLModel, table=True):

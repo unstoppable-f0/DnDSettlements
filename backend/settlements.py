@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 from sqlmodel import select
+from sqlalchemy.exc import IntegrityError
 
 from backend.db.models import CreateSettlement, SessionDep, Settlement
 
@@ -35,7 +36,12 @@ async def get_settlements_by_campaign(campaign: str,
 async def create_settlement(settlement: CreateSettlement, session: SessionDep):
     db_settlement = Settlement.model_validate(settlement)
     session.add(db_settlement)
-    session.commit()
-    session.refresh(db_settlement)
+    try:
+        session.commit()
+        session.refresh(db_settlement)
+    except IntegrityError as exc:
+        session.rollback()
+        print(exc)
+
 
     return db_settlement

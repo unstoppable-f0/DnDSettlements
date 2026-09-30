@@ -32,7 +32,7 @@ async def get_buildings_by_settlement_id(settlement_id: int,
 
 
 @buildings_router.post('/', response_model=Building)
-async def create_settlement(building: CreateBuilding, session: SessionDep):
+async def create_buildings(building: CreateBuilding, session: SessionDep):
     db_building = Building.model_validate(building)
     session.add(db_building)
     session.commit()
