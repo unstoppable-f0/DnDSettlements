@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
 from backend.db.models import Campaign, CampaignNameUpdate, SessionDep

@@ -1,13 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, HTTPException
-from sqlmodel import select, Session
+from fastapi import APIRouter, HTTPException, Query
+from sqlmodel import select
 
-from backend.db.models import (CreateEventResolution, EventResolution,
-                               ChooseEventResolution, SessionDep)
+from backend.assets import recalculate_assets
+from backend.db.models import (AssetModel, ChooseEventResolution,
+                               CreateEventResolution, EventResolution,
+                               SessionDep)
+from backend.events import resolve_event
 
 event_resolutions_router = APIRouter(
-    prefix='/event-resolutions',
+    prefix='/event_resolutions',
     tags=['event_resolutions']
 )
 
@@ -42,19 +45,45 @@ async def create_event_resolution(event_resolution: CreateEventResolution, sessi
     return db_event_resolution
 
 
-@event_resolutions_router.patch('{event_resolution_id}', response_model=EventResolution)
-async def choose_event_resolution(event_resolution_id: int,
-                                  choose_resolution: ChooseEventResolution,
-                                  session: SessionDep):
+@event_resolutions_router.patch('/{event_resolution_id}', response_model=EventResolution)
+async def choose_event_resolution(event_resolution_id: int, session: SessionDep):
     db_event_resolution = session.get(EventResolution, event_resolution_id)
-
     if not db_event_resolution:
         raise HTTPException(status_code=404, detail='Event resolution not found')
 
-    new_event_resolution_data = choose_resolution.model_dump(exclude_unset=True)
+    new_event_resolution_data = ChooseEventResolution().model_dump()
     db_event_resolution.sqlmodel_update(new_event_resolution_data)
     session.commit()
     session.refresh(db_event_resolution)
+
     return db_event_resolution
 
+@event_resolutions_router.patch('/decide/{event_resolution_id}', response_model=EventResolution)
+async def decide_on_event_resolution(event_resolution_id: int,
+                                     session: SessionDep):
 
+    """
+    Handler for handling all event resolution logic:
+    1) Choose the exact event resolution
+    2) Mark the event as resolved
+    3) Calculate and update the Settlement's assets
+    """
+
+    # UPDATE (PUT) the chosen event resolution. Grab the updated model
+    event_resolution = await choose_event_resolution(event_resolution_id, session)
+    resolution_assets = AssetModel(
+        income=event_resolution.income,
+        coffers=event_resolution.coffers,
+        resources=event_resolution.resources,
+        defence=event_resolution.defence
+    )
+
+    event_id = event_resolution.event_id
+
+    # resolve the EVENT (update its boolean)
+    resolved_event = await resolve_event(event_id, session)
+    settlement_id = resolved_event.settlement_id
+
+    await recalculate_assets(settlement_id, resolution_assets, session)
+
+    return event_resolution

@@ -1,8 +1,8 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Query
-from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
 
 from backend.db.models import CreateSettlement, SessionDep, Settlement
 

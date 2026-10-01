@@ -37,11 +37,11 @@ class Asset(SQLModel, table=True):
     defence: int
 
 
-class ChangeAsset(SQLModel):
-    income: int
-    coffers: int
-    resources: int
-    defence: int
+class AssetModel(SQLModel):
+    income: int = Field(default=0)
+    coffers: int = Field(default=0)
+    resources: int = Field(default=0)
+    defence: int = Field(default=0)
 
 
 class Event(SQLModel, table=True):
@@ -57,6 +57,10 @@ class CreateEvent(SQLModel):
     name: str
     description: str
     resolved: bool = Field(default=False)
+
+
+class ResolveEvent(SQLModel):
+    resolved: bool = Field(default=True)
 
 
 class EventResolution(SQLModel, table=True):
@@ -86,7 +90,7 @@ class CreateEventResolution(SQLModel):
 
 
 class ChooseEventResolution(SQLModel):
-    chosen: bool
+    chosen: bool = Field(default=True)
 
 
 class Building(SQLModel, table=True):
