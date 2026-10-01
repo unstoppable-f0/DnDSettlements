@@ -11,6 +11,16 @@ campaigns_router = APIRouter(
 )
 
 
+@campaigns_router.get('/{campaign_id}', response_model=Campaign)
+async def get_campaign(campaign_id: int, session: SessionDep):
+    campaign = session.get(Campaign, campaign_id)
+
+    if not campaign:
+        raise HTTPException(status_code=404, detail='Campaign not found')
+
+    return campaign
+
+
 @campaigns_router.get('/', response_model=list[Campaign])
 async def get_all_campaigns(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100):
     all_campaigns = session.exec(select(Campaign).offset(offset).limit(limit)).all()
