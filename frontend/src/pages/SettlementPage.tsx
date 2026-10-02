@@ -13,20 +13,30 @@ interface Asset {
 
 function SettlementPage() {
   const { settlementId } = useParams()
+  // const { settlementName } = useParams()
 
   const [assets, setAssets] = useState<Asset | null>(null)
   const [events, setEvents] = useState<Event[]>([])
 
-  useEffect(() => {
-    fetch(`http://localhost:8000/assets/${settlementId}`)
+
+  function loadAssets() {
+  fetch(`http://localhost:8000/assets/${settlementId}`)
+    .then(response => response.json())
+    .then(data => setAssets(data))
+}
+
+  function loadEvents() {
+      fetch(`http://localhost:8000/events/unresolved/${settlementId}`)
       .then(response => response.json())
-      .then(data => setAssets(data))
+      .then(data => setEvents(data))
+  }
+
+  useEffect(() => {
+    loadAssets()
   }, [settlementId])
 
   useEffect(() => {
-  fetch(`http://localhost:8000/events/unresolved/${settlementId}`)
-    .then(response => response.json())
-    .then(data => setEvents(data))
+      loadEvents()
   }, [settlementId])
 
   if (!assets) {
@@ -49,6 +59,12 @@ function SettlementPage() {
       <EventCard
         key={event.id}
         event={event}
+        onResolved={
+            () => {
+                loadAssets()
+                loadEvents()
+            }
+        }
       />
     ))}
 
