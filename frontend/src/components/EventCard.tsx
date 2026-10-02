@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Event } from '../types/event'
-import type { EventResolution } from '../types/eventResolution'
+import type { EventResolution, CreateEventResolution } from '../types/eventResolution'
 import EventResolutionCard from './EventResolutionCard'
 
 interface EventCardProps {
@@ -37,6 +37,15 @@ function EventCard({ event, onResolved }: EventCardProps) {
       .then(data => setResolutions(data))
   }
 
+  function resetCreateForm() {
+  setName('')
+  setDescription('')
+  setIncome(0)
+  setCoffers(0)
+  setResources(0)
+  setDefence(0)
+}
+
   async function handleChooseResolution(resolution: EventResolution) {
     setError(null)
 
@@ -59,6 +68,49 @@ function EventCard({ event, onResolved }: EventCardProps) {
       setError('Could not apply this resolution. Please try again.')
     }
   }
+
+  async function handleCreateResolution() {
+    const newResolution: CreateEventResolution = {
+      event_id: event.id,
+      name,
+      description,
+      income,
+      coffers,
+      resources,
+      defence,
+    }
+
+    try {
+      const response = await fetch(
+        'http://localhost:8000/event_resolutions/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newResolution),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to create resolution')
+      }
+
+      const createdResolution: EventResolution = await response.json()
+
+      setResolutions(current => [
+        ...current,
+        createdResolution,
+      ])
+
+      setShowCreateForm(false)
+      resetCreateForm()
+    } catch {
+      setError('Could not create resolution. Please try again.')
+    }
+  }
+
+
   return (
     <div>
       <h3>{event.name}</h3>
@@ -142,7 +194,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
               />
             </label>
 
-            <button type="button">
+            <button type="button" onClick={handleCreateResolution}>
               Вынести вердикт
             </button>
           </div>

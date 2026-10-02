@@ -9,6 +9,7 @@ from backend.db.models import create_db_and_tables
 from backend.event_resolutions import event_resolutions_router
 from backend.events import events_router
 from backend.settlements import settlements_router
+from backend.buildings import buildings_router
 
 
 @asynccontextmanager
@@ -31,6 +32,7 @@ app.include_router(settlements_router)
 app.include_router(events_router)
 app.include_router(event_resolutions_router)
 app.include_router(assets_router)
+app.include_router(buildings_router)
 
 @app.get("/")
 async def root():

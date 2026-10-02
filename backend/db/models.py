@@ -116,6 +116,10 @@ class CreateBuilding(SQLModel):
     defence: int
 
 
+class MarkBuildingBuiltModel(SQLModel):
+    is_built: bool = Field(default=True)
+
+
 sqlite_file_name = Path().cwd().joinpath('backend').joinpath('db').joinpath('settlements.db')
 sqlite_url = f'sqlite:///{sqlite_file_name}'
 

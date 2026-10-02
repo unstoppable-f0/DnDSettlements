@@ -36,7 +36,7 @@ async def get_unresolved_events_by_settlement_id(settlement_id: int,
                                                  limit: Annotated[int, Query(le=100)] = 100):
 
     unresolved_settlement_events = session.exec(select(Event).where(Event.settlement_id == settlement_id).
-                                                offset(offset).limit(limit)).all()
+                                                where(Event.resolved == False).offset(offset).limit(limit)).all()
 
     return unresolved_settlement_events
 
