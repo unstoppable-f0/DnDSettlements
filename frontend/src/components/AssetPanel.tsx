@@ -1,4 +1,4 @@
-import type { Asset } from "../types/asset.ts";
+import type { Asset } from '../types/asset'
 
 interface AssetPanelProps {
   assets: Asset
@@ -6,13 +6,30 @@ interface AssetPanelProps {
 
 function AssetPanel({ assets }: AssetPanelProps) {
   return (
-    <section>
-      <h2>Settlement Assets</h2>
+    <section className="asset-panel">
+      <h2>Активы поселения</h2>
 
-      <p style={{'color': 'orange'}}>Доход: {assets.income}</p>
-      <p style={{'color': 'darkorange'}}>Казна: {assets.coffers}</p>
-      <p style={{'color': 'saddlebrown'}}>Ресурсы: {assets.resources}</p>
-      <p style={{'color': 'indianred'}}>Обороноспособность: {assets.defence} / 20</p>
+      <div className="asset-grid">
+        <div className="asset-card">
+          <span className="asset-label">Доходность</span>
+          <strong>{assets.income}</strong>
+        </div>
+
+        <div className="asset-card">
+          <span className="asset-label">Казна</span>
+          <strong>{assets.coffers}</strong>
+        </div>
+
+        <div className="asset-card">
+          <span className="asset-label">Ресурсы</span>
+          <strong>{assets.resources}</strong>
+        </div>
+
+        <div className="asset-card">
+          <span className="asset-label">Обороноспособность</span>
+          <strong>{assets.defence} / 20</strong>
+        </div>
+      </div>
     </section>
   )
 }

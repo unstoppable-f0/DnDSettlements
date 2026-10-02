@@ -112,9 +112,11 @@ function EventCard({ event, onResolved }: EventCardProps) {
 
 
   return (
-    <div>
-      <h3>{event.name}</h3>
-      <p>{event.description}</p>
+    <div className="event-card">
+      <div className="event-header">
+        <h3>{event.name}</h3>
+        <p>{event.description}</p>
+      </div>
 
       {!showResolutions && (
         <button onClick={handleShowResolutions}>
@@ -123,7 +125,9 @@ function EventCard({ event, onResolved }: EventCardProps) {
       )}
 
       {showResolutions && (
-        <div>
+        <div className="event-resolutions">
+          <h4>Resolutions</h4>
+
           {resolutions.map(resolution => (
             <EventResolutionCard
               key={resolution.id}
@@ -132,34 +136,44 @@ function EventCard({ event, onResolved }: EventCardProps) {
             />
           ))}
 
-          <button onClick={() => setShowCreateForm(true)}>
-            Вынести собственное решение
+          <button
+            className="secondary-button"
+            onClick={() => setShowCreateForm(true)}
+          >
+            Create custom resolution
           </button>
         </div>
       )}
 
-      {error && <p role="alert">{error}</p>}
-
       {showCreateForm && (
-          <div>
-            <h4>Собственный вердикт</h4>
-            <label>
-              Название:
-              <input
-                value={name}
-                onChange={event => setName(event.target.value)}
-              />
-            </label>
+        <form
+          className="resolution-form"
+          onSubmit={event => {
+            event.preventDefault()
+            handleCreateResolution()
+          }}
+        >
+          <h4>Свой собственный вердикт</h4>
 
+          <label>
+            Название вердикта
+            <input
+              value={name}
+              onChange={event => setName(event.target.value)}
+            />
+          </label>
+
+          <label>
+            Описание
+            <textarea
+              value={description}
+              onChange={event => setDescription(event.target.value)}
+            />
+          </label>
+
+          <div className="resolution-form-assets">
             <label>
-              Описание:
-              <textarea
-                value={description}
-                onChange={event => setDescription(event.target.value)}
-              />
-            </label>
-            <label>
-              Доход:
+              Доход
               <input
                 type="number"
                 value={income}
@@ -168,7 +182,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
             </label>
 
             <label>
-              Казна:
+              Казна
               <input
                 type="number"
                 value={coffers}
@@ -177,7 +191,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
             </label>
 
             <label>
-              Рерурсы:
+              Рерурсы
               <input
                 type="number"
                 value={resources}
@@ -186,23 +200,36 @@ function EventCard({ event, onResolved }: EventCardProps) {
             </label>
 
             <label>
-              Обороноспособность:
+              Обороноспособность
               <input
                 type="number"
                 value={defence}
                 onChange={event => setDefence(Number(event.target.value))}
               />
             </label>
+          </div>
 
-            <button type="button" onClick={handleCreateResolution}>
-              Вынести вердикт
+          <div className="resolution-form-actions">
+            <button type="submit">
+              Create resolution
+            </button>
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setShowCreateForm(false)}
+            >
+              Cancel
             </button>
           </div>
+        </form>
       )}
 
+      {error && <p role="alert">{error}</p>}
+
       {chosenResolution && (
-        <p style={{color: 'green', fontWeight: 'bold'}}>
-          Выбрано: {chosenResolution.name}
+        <p>
+          Selected: {chosenResolution.name}
         </p>
       )}
     </div>

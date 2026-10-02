@@ -32,7 +32,7 @@ function CampaignPage() {
     }
 
     fetch(
-      `http://localhost:8000/settlements/${encodeURIComponent(campaign.name)}`
+      `http://localhost:8000/settlements/campaigns/${encodeURIComponent(campaign.name)}`
     )
       .then(response => response.json())
       .then(data => setSettlements(data))

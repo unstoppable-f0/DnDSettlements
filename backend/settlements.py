@@ -1,6 +1,7 @@
+from http.client import HTTPException
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
@@ -18,7 +19,16 @@ async def get_all_settlements(session: SessionDep, offset: int = 0, limit: Annot
     return all_settlements
 
 
-@settlements_router.get('/{campaign}', response_model=list[Settlement])
+@settlements_router.get('/{settlement_id}', response_model=Settlement)
+async def get_settlement(settlement_id: int, session: SessionDep):
+    settlement = session.get(Settlement, settlement_id)
+    if not settlement:
+        raise HTTPException(status_code=404, detail="Settlement not found")
+
+    return settlement
+
+
+@settlements_router.get('/campaigns/{campaign}', response_model=list[Settlement])
 async def get_settlements_by_campaign(campaign: str,
                                       session: SessionDep,
                                       offset: int = 0,

@@ -7,6 +7,7 @@ import AssetPanel from "../components/AssetPanel.tsx";
 import type { Event } from '../types/event'
 import type { Building } from '../types/building'
 import type { Asset } from '../types/asset.ts'
+import type { Settlement} from "../types/settlement.ts"
 
 
 function SettlementPage() {
@@ -16,6 +17,7 @@ function SettlementPage() {
   const [assets, setAssets] = useState<Asset | null>(null)
   const [events, setEvents] = useState<Event[]>([])
   const [buildings, setBuildings] = useState<Building[]>([])
+  const [settlement, setSettlement] = useState<Settlement | null>(null)
 
 
   function loadAssets() {
@@ -49,63 +51,79 @@ function SettlementPage() {
       loadBuildings()
     }, [settlementId])
 
-  if (!assets) {
+  function loadSettlement() {
+      fetch(`http://localhost:8000/settlements/${settlementId}`)
+      .then(response => response.json())
+      .then(data => setSettlement(data))
+  }
+
+  useEffect(() => {
+      loadSettlement()
+  }, [settlementId])
+
+  if (!assets || !settlement) {
     return <p>Загрузка поселения...</p>
   }
 
   return (
-    <main>
-      <h1>Поселение</h1>
+      <main className="settlement-page">
+        <header className="settlement-header">
+          <h1>{settlement.name}</h1>
 
-      <AssetPanel assets={assets} />
+          <AssetPanel assets={assets} />
+        </header>
 
+        <nav className="settlement-tabs">
+          <button
+            className={activeTab === 'events' ? 'active' : ''}
+            onClick={() => setActiveTab('events')}
+          >
+            События
+          </button>
 
-    <div>
-      <button onClick={() => setActiveTab('events')}>
-        Events
-      </button>
+          <button
+            className={activeTab === 'buildings' ? 'active' : ''}
+            onClick={() => setActiveTab('buildings')}
+          >
+            Проекты строительства
+          </button>
+        </nav>
 
-      <button onClick={() => setActiveTab('buildings')}>
-        Buildings
-      </button>
-    </div>
+        {activeTab === 'events' && (
+          <section className="settlement-content">
+            <h2>События</h2>
 
-    {activeTab === 'events' && (
-      <section>
-        <h2>События</h2>
+            {events.map(event => (
+              <EventCard
+                key={event.id}
+                event={event}
+                onResolved={() => {
+                  loadAssets()
+                  loadEvents()
+                }}
+              />
+            ))}
+          </section>
+        )}
 
-        {events.map(event => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onResolved={() => {
-              loadAssets()
-              loadEvents()
-            }}
-          />
-        ))}
-      </section>
-    )}
+        {activeTab === 'buildings' && (
+          <section className="settlement-content">
+            <h2>Проекты строительства</h2>
 
-    {activeTab === 'buildings' && (
-      <section>
-        <h2>Buildings</h2>
-
-        {buildings.map(building => (
-          <BuildingCard
-            key={building.id}
-            building={building}
-            onBuilt={() => {
-              loadBuildings()
-              loadAssets()
-            }}
-          />
-        ))}
-      </section>
-    )}
-
-    </main>
-  )
+            {buildings.map(building => (
+              <BuildingCard
+                key={building.id}
+                building={building}
+                onBuilt={() => {
+                  loadBuildings()
+                  loadAssets()
+                }}
+              />
+            ))}
+          </section>
+        )}
+      </main>
+    )
 }
 
 export default SettlementPage
