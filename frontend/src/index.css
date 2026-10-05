@@ -183,6 +183,22 @@ button {
   gap: 8px;
 }
 
+.asset-income {
+  border-color: goldenrod;
+}
+
+.asset-coffers {
+  border-color: darkorange;
+}
+
+.asset-resources {
+  border-color: saddlebrown;
+}
+
+.asset-defence {
+  border-color: olive;
+}
+
 .asset-label {
   font-size: 0.8rem;
   text-transform: uppercase;

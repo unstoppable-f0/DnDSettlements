@@ -19,16 +19,16 @@ function ResolvedEventCard({
       </div>
 
       <div className="event-resolution">
-        <h4>Chosen resolution</h4>
+        <h4>Принятое решение</h4>
 
         <h5>{resolution.name}</h5>
         <p>{resolution.description}</p>
 
         <div className="resolution-assets">
-          <AssetChange label="Income" value={resolution.income} />
-          <AssetChange label="Coffers" value={resolution.coffers} />
-          <AssetChange label="Resources" value={resolution.resources} />
-          <AssetChange label="Defence" value={resolution.defence} />
+            <AssetChange label="Доход" value={resolution.income}/>
+            <AssetChange label="Казна" value={resolution.coffers}/>
+            <AssetChange label="Ресурсы" value={resolution.resources}/>
+            <AssetChange label="Обороноспособность" value={resolution.defence}/>
         </div>
       </div>
     </div>
