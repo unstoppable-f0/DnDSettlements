@@ -1,47 +1,42 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import HTTPException, Query
 from sqlmodel import select
 
 from backend.db.models import CreateEvent, Event, ResolveEvent, SessionDep
 
-events_router = APIRouter(
-    prefix="/events",
-    tags=['events']
-)
 
+async def read_all_events(session: SessionDep,
+                          offset: int = 0,
+                          limit: Annotated[int, Query(le=100)] = 100) -> list[Event]:
 
-@events_router.get('/', response_model=list[Event])
-async def get_all_events(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100):
     all_events = session.exec(select(Event).offset(offset).limit(limit)).all()
     return all_events
 
 
-@events_router.get('/{settlement_id}', response_model=list[Event])
-async def get_all_events_by_settlement_id(settlement_id: int,
+async def read_all_events_by_settlement_id(settlement_id: int,
                                           session: SessionDep,
                                           offset: int = 0,
-                                          limit: Annotated[int, Query(le=100)] = 100):
-
+                                          limit: Annotated[int, Query(le=100)] = 100) -> list[Event]:
 
     events_by_campaign = session.exec(select(Event).where(Event.settlement_id == settlement_id).
                                            offset(offset).limit(limit)).all()
 
     return events_by_campaign
 
-@events_router.get('/unresolved/{settlement_id}', response_model=list[Event])
-async def get_unresolved_events_by_settlement_id(settlement_id: int,
-                                                 session: SessionDep,
-                                                 offset: int = 0,
-                                                 limit: Annotated[int, Query(le=100)] = 100):
+
+async def read_unresolved_events_by_settlement_id(settlement_id: int,
+                                                  session: SessionDep,
+                                                  offset: int = 0,
+                                                  limit: Annotated[int, Query(le=100)] = 100) -> list[Event]:
 
     unresolved_settlement_events = session.exec(select(Event).where(Event.settlement_id == settlement_id).
                                                 where(Event.resolved == False).offset(offset).limit(limit)).all()
 
     return unresolved_settlement_events
 
-@events_router.post('/', response_model=Event)
-async def create_event(event: CreateEvent, session: SessionDep):
+
+async def make_event(event: CreateEvent, session: SessionDep) -> Event:
     db_event = Event.model_validate(event)
     session.add(db_event)
     session.commit()

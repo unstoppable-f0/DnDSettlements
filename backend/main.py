@@ -7,9 +7,9 @@ from backend.assets.router import assets_router
 from backend.buildings.router import buildings_router
 from backend.campaigns.router import campaigns_router
 from backend.db.models import create_db_and_tables
-from backend.event_resolutions import event_resolutions_router
-from backend.events import events_router
-from backend.settlements import settlements_router
+from backend.event_resolutions.router import event_resolutions_router
+from backend.events.router import events_router
+from backend.settlements.router import settlements_router
 
 
 @asynccontextmanager
