@@ -15,7 +15,7 @@ function CampaignCard({ campaign }: CampaignCardProps) {
       <h2>{campaign.name}</h2>
 
       <Link to={`/campaigns/${campaign.id}`}>
-        Enter
+        Перейти к кампании
       </Link>
     </div>
   )

@@ -4,8 +4,13 @@ from fastapi import Query
 from sqlmodel import select
 
 from backend.assets.service import recalculate_assets
-from backend.db.models import (AssetModel, Building, CreateBuilding,
-                               MarkBuildingBuiltModel, SessionDep)
+from backend.db.models import (
+    AssetModel,
+    Building,
+    CreateBuilding,
+    MarkBuildingBuiltModel,
+    SessionDep,
+)
 
 
 async def read_building_by_id(building_id: int, session: SessionDep) -> Building:

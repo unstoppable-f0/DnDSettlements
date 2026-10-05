@@ -1,8 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
-from backend.assets.service import (make_assets, read_all_assets,
-                                    read_assets_by_settlement_id,
-                                    renew_assets_by_settlement_id)
+from backend.assets.service import (
+    make_assets,
+    read_all_assets,
+    read_assets_by_settlement_id,
+    renew_assets_by_settlement_id,
+)
 from backend.db.models import Asset, AssetModel, SessionDep
 
 assets_router = APIRouter(

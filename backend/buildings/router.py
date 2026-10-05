@@ -1,9 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
-from backend.buildings.service import (complete_building_project,
-                                       make_building_project,
-                                       read_all_buildings, read_building_by_id,
-                                       read_buildings_by_settlement_id)
+from backend.buildings.service import (
+    complete_building_project,
+    make_building_project,
+    read_all_buildings,
+    read_building_by_id,
+    read_buildings_by_settlement_id,
+)
 from backend.db.models import Building, CreateBuilding, SessionDep
 
 buildings_router = APIRouter(

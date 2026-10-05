@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import EventCard from '../components/EventCard'
+import ResolvedEventCard from "../components/ResolvedEventCard.tsx";
 import BuildingCard from '../components/BuildingCard'
 import AssetPanel from "../components/AssetPanel.tsx";
 
@@ -8,14 +9,19 @@ import type { Event } from '../types/event'
 import type { Building } from '../types/building'
 import type { Asset } from '../types/asset.ts'
 import type { Settlement} from "../types/settlement.ts"
+import type { EventResolution } from "../types/eventResolution.ts";
 
 
 function SettlementPage() {
   const { settlementId } = useParams()
-  const [activeTab, setActiveTab] = useState<'events' | 'buildings'>('events')
+  const [activeTab, setActiveTab] = useState<'events' | 'buildings' | 'resolved-events'>('events')
 
   const [assets, setAssets] = useState<Asset | null>(null)
   const [events, setEvents] = useState<Event[]>([])
+
+  const [resolvedEvents, setResolvedEvents] = useState<Event[]>([])
+  const [chosenResolutions, setChosenResolutions] = useState<EventResolution[]>([])
+
   const [buildings, setBuildings] = useState<Building[]>([])
   const [settlement, setSettlement] = useState<Settlement | null>(null)
 
@@ -40,6 +46,41 @@ function SettlementPage() {
       loadEvents()
   }, [settlementId])
 
+  function loadResolvedEvents() {
+      fetch(`http://localhost:8000/events/resolved/${settlementId}`)
+          .then(response => response.json())
+          .then(data => setResolvedEvents(data))
+    }
+
+    useEffect(() => {
+        loadResolvedEvents()
+    }, [settlementId]);
+
+
+  function loadChosenResolutions() {
+      const eventIds = resolvedEvents.map(event => event.id)
+
+      if (eventIds.length === 0) {
+        setChosenResolutions([])
+        return
+      }
+
+      const params = new URLSearchParams()
+
+      eventIds.forEach(id => {
+        params.append('event_ids', String(id))
+      })
+
+      fetch(
+        `http://localhost:8000/event_resolutions/many_chosen/?${params.toString()}`
+      )
+        .then(response => response.json())
+        .then(data => setChosenResolutions(data))
+    }
+
+  useEffect(() => {
+      loadChosenResolutions()
+    }, [resolvedEvents])
 
   function loadBuildings() {
       fetch(`http://localhost:8000/buildings/settlements/${settlementId}`)
@@ -87,6 +128,13 @@ function SettlementPage() {
           >
             Проекты строительства
           </button>
+
+          <button
+            className={activeTab === 'resolved-events' ? 'active' : ''}
+            onClick={() => setActiveTab('resolved-events')}
+          >
+            История событий
+          </button>
         </nav>
 
         {activeTab === 'events' && (
@@ -122,6 +170,34 @@ function SettlementPage() {
             ))}
           </section>
         )}
+
+    {activeTab === 'resolved-events' && (
+      <section className="settlement-content">
+        <h2>Resolved Events</h2>
+
+        {resolvedEvents.length === 0 ? (
+          <p>No resolved events yet.</p>
+        ) : (
+          resolvedEvents.map(event => {
+            const resolution = chosenResolutions.find(
+              resolution => resolution.event_id === event.id
+            )
+
+            if (!resolution) {
+              return null
+            }
+
+            return (
+              <ResolvedEventCard
+                key={event.id}
+                event={event}
+                resolution={resolution}
+              />
+            )
+          })
+        )}
+      </section>
+    )}
       </main>
     )
 }

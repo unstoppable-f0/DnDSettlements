@@ -1,7 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
-from backend.campaigns.service import (begin_campaign, change_campaign_name,
-                                       read_all_campaigns, read_campaign)
+from backend.campaigns.service import (
+    begin_campaign,
+    change_campaign_name,
+    read_all_campaigns,
+    read_campaign,
+)
 from backend.db.models import Campaign, CampaignNameUpdate, SessionDep
 
 campaigns_router = APIRouter(

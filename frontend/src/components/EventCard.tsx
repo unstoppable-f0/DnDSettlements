@@ -5,10 +5,6 @@ import EventResolutionCard from './EventResolutionCard'
 
 interface EventCardProps {
   event: Event
-}
-
-interface EventCardProps {
-  event: Event
   onResolved: () => void
 }
 

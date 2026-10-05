@@ -16,7 +16,7 @@ function SettlementCard({ settlement }: SettlementCardProps) {
       <h3>{settlement.name}</h3>
 
       <Link to={`/settlements/${settlement.id}`}>
-        Enter
+        Войти в поселение
       </Link>
     </div>
   )

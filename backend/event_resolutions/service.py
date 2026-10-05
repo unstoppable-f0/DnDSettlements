@@ -4,9 +4,13 @@ from fastapi import Query
 from sqlmodel import select
 
 from backend.assets.service import recalculate_assets
-from backend.db.models import (AssetModel, ChooseEventResolution,
-                               CreateEventResolution, EventResolution,
-                               SessionDep)
+from backend.db.models import (
+    AssetModel,
+    ChooseEventResolution,
+    CreateEventResolution,
+    EventResolution,
+    SessionDep,
+)
 from backend.events.service import resolve_event
 
 
@@ -27,6 +31,28 @@ async def read_event_resolutions_by_id(event_id: int,
                                            offset(offset).limit(limit)).all()
 
     return event_resolutions_by_campaign
+
+
+async def read_chosen_resolution_by_event_id(event_id: int, session: SessionDep) -> EventResolution:
+
+    chosen_resolution = session.exec(select(EventResolution).where(EventResolution.event_id == event_id)
+                                     .where(EventResolution.chosen == True)).one()
+
+    return chosen_resolution
+
+
+async def read_many_chosen_resolutions(event_ids: list[int],
+                                       session: SessionDep,
+                                       offset: int = 0,
+                                       limit: Annotated[int, Query(le=100)] = 100
+                                       ) -> list[EventResolution]:
+
+    chosen_resolutions = session.exec(select(EventResolution).where(EventResolution.chosen == True)
+                            .where(EventResolution.event_id.in_(event_ids)).offset(offset).limit(limit)).all()
+
+
+    return chosen_resolutions
+
 
 
 async def make_event_resolution(event_resolution: CreateEventResolution, session: SessionDep) -> EventResolution:

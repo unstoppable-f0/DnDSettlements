@@ -1,12 +1,16 @@
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Query
 
-from backend.db.models import (CreateEventResolution, EventResolution,
-                               SessionDep)
-from backend.event_resolutions.service import (decide_the_event_resolution,
-                                               make_event_resolution,
-                                               mark_as_chosen_resolution,
-                                               read_all_event_resolutions,
-                                               read_event_resolutions_by_id)
+from backend.db.models import CreateEventResolution, EventResolution, SessionDep
+from backend.event_resolutions.service import (
+    decide_the_event_resolution,
+    make_event_resolution,
+    mark_as_chosen_resolution,
+    read_all_event_resolutions,
+    read_event_resolutions_by_id,
+    read_chosen_resolution_by_event_id,
+    read_many_chosen_resolutions,
+)
 
 event_resolutions_router = APIRouter(
     prefix='/event_resolutions',
@@ -25,12 +29,27 @@ async def get_all_event_resolutions(session: SessionDep):
 @event_resolutions_router.get('/{event_id}', response_model=list[EventResolution])
 async def get_event_resolutions_by_event_id(event_id: int, session: SessionDep):
 
-
     event_resolutions_by_campaign = await read_event_resolutions_by_id(event_id, session)
     if not event_resolutions_by_campaign:
         raise HTTPException(status_code=404, detail='No event resolutions found for that campaign')
     return event_resolutions_by_campaign
 
+
+@event_resolutions_router.get('/chosen/{event_id}', response_model=EventResolution)
+async def get_chosen_resolution_by_event_id(event_id: int, session: SessionDep):
+    chosen_resolution = await read_chosen_resolution_by_event_id(event_id, session)
+
+    if not chosen_resolution:
+        raise HTTPException(status_code=404, detail='No event resolutions found for that campaign')
+    return chosen_resolution
+
+
+@event_resolutions_router.get('/many_chosen/', response_model=list[EventResolution])
+async def get_many_chosen_resolutions(event_ids: Annotated[list[int] | None, Query()], session: SessionDep):
+    chosen_resolutions = await read_many_chosen_resolutions(event_ids, session)
+    if not chosen_resolutions:
+        raise HTTPException(status_code=404, detail='No event resolutions found for that campaign')
+    return chosen_resolutions
 
 
 @event_resolutions_router.post('/', response_model=EventResolution)

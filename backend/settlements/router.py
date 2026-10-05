@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
 from backend.db.models import CreateSettlement, SessionDep, Settlement
-from backend.settlements.service import (make_new_settlement,
-                                         read_all_settlements,
-                                         read_one_settlement,
-                                         read_settlements_by_campaign)
+from backend.settlements.service import (
+    make_new_settlement,
+    read_all_settlements,
+    read_one_settlement,
+    read_settlements_by_campaign,
+)
 
 settlements_router = APIRouter(
     prefix="/settlements",

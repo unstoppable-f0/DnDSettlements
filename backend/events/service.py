@@ -36,6 +36,17 @@ async def read_unresolved_events_by_settlement_id(settlement_id: int,
     return unresolved_settlement_events
 
 
+async def read_resolved_events_by_settlement_id(settlement_id: int,
+                                                session: SessionDep,
+                                                offset: int = 0,
+                                                limit: Annotated[int, Query(le=100)] = 100) -> list[Event]:
+
+    resolved_settlement_events = session.exec(select(Event).where(Event.settlement_id == settlement_id).
+                                                where(Event.resolved == True).offset(offset).limit(limit)).all()
+
+    return resolved_settlement_events
+
+
 async def make_event(event: CreateEvent, session: SessionDep) -> Event:
     db_event = Event.model_validate(event)
     session.add(db_event)
