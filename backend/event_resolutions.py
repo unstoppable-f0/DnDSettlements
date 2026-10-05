@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
-from backend.assets import recalculate_assets
+from backend.assets.service import recalculate_assets
 from backend.db.models import (AssetModel, ChooseEventResolution,
                                CreateEventResolution, EventResolution,
                                SessionDep)

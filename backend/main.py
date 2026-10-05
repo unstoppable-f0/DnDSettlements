@@ -3,13 +3,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.assets import assets_router
-from backend.campaigns import campaigns_router
+from backend.assets.router import assets_router
+from backend.buildings.router import buildings_router
+from backend.campaigns.router import campaigns_router
 from backend.db.models import create_db_and_tables
 from backend.event_resolutions import event_resolutions_router
 from backend.events import events_router
 from backend.settlements import settlements_router
-from backend.buildings import buildings_router
 
 
 @asynccontextmanager

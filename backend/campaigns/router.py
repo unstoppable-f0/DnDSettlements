@@ -1,8 +1,7 @@
-from typing import Annotated
+from fastapi import APIRouter, HTTPException
 
-from fastapi import APIRouter, HTTPException, Query
-from sqlmodel import select
-
+from backend.campaigns.service import (begin_campaign, change_campaign_name,
+                                       read_all_campaigns, read_campaign)
 from backend.db.models import Campaign, CampaignNameUpdate, SessionDep
 
 campaigns_router = APIRouter(
@@ -13,7 +12,7 @@ campaigns_router = APIRouter(
 
 @campaigns_router.get('/{campaign_id}', response_model=Campaign)
 async def get_campaign(campaign_id: int, session: SessionDep):
-    campaign = session.get(Campaign, campaign_id)
+    campaign = await read_campaign(campaign_id, session)
 
     if not campaign:
         raise HTTPException(status_code=404, detail='Campaign not found')
@@ -22,31 +21,28 @@ async def get_campaign(campaign_id: int, session: SessionDep):
 
 
 @campaigns_router.get('/', response_model=list[Campaign])
-async def get_all_campaigns(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100):
-    all_campaigns = session.exec(select(Campaign).offset(offset).limit(limit)).all()
+async def get_all_campaigns(session: SessionDep):
+    all_campaigns = await read_all_campaigns(session)
+    if not all_campaigns:
+        raise HTTPException(status_code=404, detail='No campaigns found')
+
     return all_campaigns
 
 
 @campaigns_router.post('/', response_model=Campaign)
 async def create_campaign(campaign: CampaignNameUpdate, session: SessionDep):
-    db_campaign = Campaign.model_validate(campaign)
-    session.add(db_campaign)
-    session.commit()
-    session.refresh(db_campaign)
+    db_campaign = await begin_campaign(campaign, session)
+    if not db_campaign:
+        raise HTTPException(status_code=404, detail='Campaign not found')
 
     return db_campaign
 
 
 @campaigns_router.patch('/{campaign_id}', response_model=Campaign)
-async def change_campaign_name(campaign_id: int, campaign: CampaignNameUpdate, session: SessionDep):
-    db_campaign = session.get(Campaign, campaign_id)
+async def update_campaign_name(campaign_id: int, campaign: CampaignNameUpdate, session: SessionDep):
+    db_campaign = await change_campaign_name(campaign_id, campaign, session)
 
     if not db_campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
-
-    new_campaign_data = campaign.model_dump(exclude_unset=True)
-    db_campaign.sqlmodel_update(new_campaign_data)
-    session.commit()
-    session.refresh(db_campaign)
     return db_campaign
 
