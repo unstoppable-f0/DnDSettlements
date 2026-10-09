@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: .
+    container_name: backend-hades
+    ports:
+      - "8000:8000"
+    networks:
+      - astral_sea
+
+  frontend:
+    container_name: frontend-elysium
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    networks:
+      - astral_sea
+
+networks:
+  astral_sea:
+    driver: bridge
