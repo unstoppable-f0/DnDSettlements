@@ -28,7 +28,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
   function handleShowResolutions() {
     setShowResolutions(true)
 
-    fetch(`http://localhost:8000/event_resolutions/${event.id}`)
+    fetch(`/api/event_resolutions/${event.id}`)
       .then(response => response.json())
       .then(data => setResolutions(data))
   }
@@ -47,7 +47,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
 
     try {
       const response = await fetch(
-          `http://localhost:8000/event_resolutions/decide/${resolution.id}`,
+          `/api/event_resolutions/decide/${resolution.id}`,
           {
             method: 'PATCH',
           },
@@ -78,7 +78,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
 
     try {
       const response = await fetch(
-        'http://localhost:8000/event_resolutions/',
+        '/api/event_resolutions/',
         {
           method: 'POST',
           headers: {

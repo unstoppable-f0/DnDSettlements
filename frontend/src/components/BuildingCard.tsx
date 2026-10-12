@@ -21,7 +21,7 @@ function BuildingCard({
 
         try {
             const response = await fetch(
-                `http://localhost:8000/buildings/build/${building.id}`,
+                `/api/buildings/build/${building.id}`,
                 {
                     method: 'PATCH',
                 },

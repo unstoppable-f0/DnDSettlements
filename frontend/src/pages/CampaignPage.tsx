@@ -21,7 +21,7 @@ function CampaignPage() {
   const [settlements, setSettlements] = useState<Settlement[]>([])
 
   useEffect(() => {
-    fetch(`http://localhost:8000/campaigns/${campaignId}`)
+    fetch(`/api/campaigns/${campaignId}`)
       .then(response => response.json())
       .then(data => setCampaign(data))
   }, [campaignId])
@@ -32,7 +32,7 @@ function CampaignPage() {
     }
 
     fetch(
-      `http://localhost:8000/settlements/campaigns/${encodeURIComponent(campaign.name)}`
+      `/api/settlements/campaigns/${encodeURIComponent(campaign.name)}`
     )
       .then(response => response.json())
       .then(data => setSettlements(data))

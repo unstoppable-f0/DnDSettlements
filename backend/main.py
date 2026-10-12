@@ -20,13 +20,13 @@ async def lifespan(app: FastAPI):
 origins = ['http://localhost:5173']
 
 app = FastAPI(lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 app.include_router(campaigns_router)
 app.include_router(settlements_router)
 app.include_router(events_router)

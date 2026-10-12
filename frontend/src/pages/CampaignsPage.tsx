@@ -10,7 +10,7 @@ function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
 
   useEffect(() => {
-    fetch('http://localhost:8000/campaigns/')
+    fetch('/api/campaigns/')
       .then(response => response.json())
       .then(data => setCampaigns(data))
   }, [])

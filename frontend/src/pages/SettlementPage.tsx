@@ -27,7 +27,7 @@ function SettlementPage() {
 
 
   function loadAssets() {
-      fetch(`http://localhost:8000/assets/${settlementId}`)
+      fetch(`/api/assets/${settlementId}`)
         .then(response => response.json())
         .then(data => setAssets(data))
     }
@@ -37,7 +37,7 @@ function SettlementPage() {
   }, [settlementId])
 
   function loadEvents() {
-      fetch(`http://localhost:8000/events/unresolved/${settlementId}`)
+      fetch(`/api/events/unresolved/${settlementId}`)
       .then(response => response.json())
       .then(data => setEvents(data))
   }
@@ -47,7 +47,7 @@ function SettlementPage() {
   }, [settlementId])
 
   function loadResolvedEvents() {
-      fetch(`http://localhost:8000/events/resolved/${settlementId}`)
+      fetch(`/api/events/resolved/${settlementId}`)
           .then(response => response.json())
           .then(data => setResolvedEvents(data))
     }
@@ -72,7 +72,7 @@ function SettlementPage() {
       })
 
       fetch(
-        `http://localhost:8000/event_resolutions/many_chosen/?${params.toString()}`
+        `/api/event_resolutions/many_chosen/?${params.toString()}`
       )
         .then(response => response.json())
         .then(data => setChosenResolutions(data))
@@ -83,7 +83,7 @@ function SettlementPage() {
     }, [resolvedEvents])
 
   function loadBuildings() {
-      fetch(`http://localhost:8000/buildings/settlements/${settlementId}`)
+      fetch(`/api/buildings/settlements/${settlementId}`)
         .then(response => response.json())
         .then(data => setBuildings(data))
   }
@@ -93,7 +93,7 @@ function SettlementPage() {
     }, [settlementId])
 
   function loadSettlement() {
-      fetch(`http://localhost:8000/settlements/${settlementId}`)
+      fetch(`/api/settlements/${settlementId}`)
       .then(response => response.json())
       .then(data => setSettlement(data))
   }
