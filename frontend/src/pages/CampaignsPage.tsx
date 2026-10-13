@@ -17,7 +17,7 @@ function CampaignsPage() {
 
   return (
     <main>
-      <h1>Choose campaign</h1>
+      <h1>Выберите кампанию</h1>
 
       {campaigns.map(campaign => (
         <CampaignCard

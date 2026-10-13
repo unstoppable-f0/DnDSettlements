@@ -16,7 +16,7 @@ async def read_all_campaigns(session: SessionDep,
                              offset: int = 0,
                              limit: Annotated[int, Query(le=100)] = 100) -> list[Campaign]:
 
-    result = await session.exec(select(Campaign).offset(offset).limit(limit)).all()
+    result = await session.exec(select(Campaign).offset(offset).limit(limit))
     all_campaigns = result.all()
     return all_campaigns
 

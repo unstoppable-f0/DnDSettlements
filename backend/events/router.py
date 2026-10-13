@@ -55,7 +55,7 @@ async def get_resolved_events_by_settlement_id(settlement_id: int, session: Sess
 
 @events_router.post('/', response_model=Event)
 async def create_event(event: CreateEvent, session: SessionDep):
-    db_event = make_event(event, session)
+    db_event = await make_event(event, session)
     if not db_event:
         raise HTTPException(status_code=404, detail="Could not create event ")
     return db_event

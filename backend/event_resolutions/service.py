@@ -18,7 +18,7 @@ async def read_all_event_resolutions(session: SessionDep,
                                      offset: int = 0,
                                      limit: Annotated[int, Query(le=100)] = 100) -> list[EventResolution]:
 
-    result = await session.exec(select(EventResolution).offset(offset).limit(limit)).all()
+    result = await session.exec(select(EventResolution).offset(offset).limit(limit))
     all_event_resolutions = result.all()
     return all_event_resolutions
 
@@ -51,7 +51,7 @@ async def read_many_chosen_resolutions(event_ids: list[int],
                                        ) -> list[EventResolution]:
 
     result = await session.exec(select(EventResolution).where(EventResolution.chosen == True)
-                            .where(EventResolution.event_id.in_(event_ids)).offset(offset).limit(limit)).all()
+                            .where(EventResolution.event_id.in_(event_ids)).offset(offset).limit(limit))
     chosen_resolutions = result.all()
 
 

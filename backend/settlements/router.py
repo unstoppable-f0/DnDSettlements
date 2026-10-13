@@ -29,9 +29,9 @@ async def get_settlement(settlement_id: int, session: SessionDep):
     return settlement
 
 
-@settlements_router.get('/campaigns/{campaign}', response_model=list[Settlement])
-async def get_settlements_by_campaign(campaign: str, session: SessionDep):
-    settlements_by_campaign = await read_settlements_by_campaign(campaign, session)
+@settlements_router.get('/campaigns/{campaign_id}', response_model=list[Settlement])
+async def get_settlements_by_campaign(campaign_id: int, session: SessionDep):
+    settlements_by_campaign = await read_settlements_by_campaign(campaign_id, session)
 
     return settlements_by_campaign
 

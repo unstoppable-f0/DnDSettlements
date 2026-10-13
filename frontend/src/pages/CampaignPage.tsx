@@ -37,7 +37,7 @@ function CampaignPage() {
   }, [campaign])
 
   if (!campaign) {
-    return <p>Loading campaign...</p>
+    return <p>Загрузка кампании...</p>
   }
 
   return (

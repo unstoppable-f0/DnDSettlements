@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Query
+from fastapi import Query, HTTPException
 from sqlmodel import select
 
 from backend.assets.service import recalculate_assets
@@ -51,7 +51,10 @@ async def make_building_project(building: CreateBuilding, session: SessionDep) -
 async def mark_as_built(building_id: int, session: SessionDep) -> Building:
     db_building = await session.get(Building, building_id)
     mark_as_built_data = MarkBuildingBuiltModel().model_dump()
-    db_building.sqlmodel_update(mark_as_built_data)
+    if db_building:
+        db_building.sqlmodel_update(mark_as_built_data)
+    else:
+        raise HTTPException(status_code=404, detail="Building not found")
     await session.commit()
     await session.refresh(db_building)
 
@@ -60,6 +63,8 @@ async def mark_as_built(building_id: int, session: SessionDep) -> Building:
 
 async def complete_building_project(building_id: int, session: SessionDep) -> Building:
     building = await read_building_by_id(building_id, session)
+    if not building:
+        raise HTTPException(status_code=404, detail="Building not found")
 
     building_assets = AssetModel(
         income=building.income,
