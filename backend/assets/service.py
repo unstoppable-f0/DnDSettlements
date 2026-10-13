@@ -10,20 +10,21 @@ async def read_all_assets(session: SessionDep,
                           offset: int = 0,
                           limit: Annotated[int, Query(le=100)] = 100) -> list[Asset]:
 
-    db_all_assets = session.exec(select(Asset).offset(offset).limit(limit)).all()
+    result = await session.exec(select(Asset).offset(offset).limit(limit))
+    db_all_assets = result.all()
     return db_all_assets
 
 
 async def read_assets_by_settlement_id(settlement_id: int, session: SessionDep) -> Asset:
-    settlement_assets = session.get(Asset, settlement_id)
+    settlement_assets = await session.get(Asset, settlement_id)
     return settlement_assets
 
 
 async def make_assets(asset: Asset, session: SessionDep) -> Asset:
     db_asset = Asset.model_validate(asset)
     session.add(db_asset)
-    session.commit()
-    session.refresh(db_asset)
+    await session.commit()
+    await session.refresh(db_asset)
 
     return db_asset
 
@@ -35,8 +36,8 @@ async def renew_assets_by_settlement_id(settlement_id: int, asset: AssetModel, s
 
     new_assets_data = asset.model_dump(exclude_unset=True)
     settlement_assets.sqlmodel_update(new_assets_data)
-    session.commit()
-    session.refresh(settlement_assets)
+    await session.commit()
+    await session.refresh(settlement_assets)
 
     return settlement_assets
 

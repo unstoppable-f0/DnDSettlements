@@ -31,9 +31,7 @@ function CampaignPage() {
       return
     }
 
-    fetch(
-      `/api/settlements/campaigns/${encodeURIComponent(campaign.name)}`
-    )
+    fetch(`/api/settlements/campaigns/${campaign.id}`)
       .then(response => response.json())
       .then(data => setSettlements(data))
   }, [campaign])
@@ -46,7 +44,7 @@ function CampaignPage() {
     <main>
       <h1>{campaign.name}</h1>
 
-      <h2>Settlements</h2>
+      <h2>Поселения</h2>
 
       {settlements.map(settlement => (
           <SettlementCard

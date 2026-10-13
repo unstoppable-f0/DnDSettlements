@@ -116,13 +116,13 @@ function EventCard({ event, onResolved }: EventCardProps) {
 
       {!showResolutions && (
         <button onClick={handleShowResolutions}>
-          Show resolutions
+          Избрать решение
         </button>
       )}
 
       {showResolutions && (
         <div className="event-resolutions">
-          <h4>Resolutions</h4>
+          <h4>Вердикты</h4>
 
           {resolutions.map(resolution => (
             <EventResolutionCard
@@ -136,7 +136,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
             className="secondary-button"
             onClick={() => setShowCreateForm(true)}
           >
-            Create custom resolution
+            Выбрать свой вариант
           </button>
         </div>
       )}
@@ -207,7 +207,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
 
           <div className="resolution-form-actions">
             <button type="submit">
-              Create resolution
+              Создать вердикт
             </button>
 
             <button
@@ -215,7 +215,7 @@ function EventCard({ event, onResolved }: EventCardProps) {
               className="secondary-button"
               onClick={() => setShowCreateForm(false)}
             >
-              Cancel
+              Отмена
             </button>
           </div>
         </form>

@@ -1,8 +1,10 @@
-from pathlib import Path
-from typing import Annotated
+from os import getenv
+from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlmodel import Field, Session, SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 class Campaign(SQLModel, table=True):
@@ -17,16 +19,16 @@ class CampaignNameUpdate(SQLModel):
 class Settlement(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)
-    campaign: str = Field(foreign_key='campaign.name')
+    campaign: int = Field(foreign_key='campaign.id')
 
 
 class CreateSettlement(SQLModel):
     name: str
-    campaign: str
+    campaign: int
 
 
 class GetSettlementsByCampaign(SQLModel):
-    campaign: str
+    campaign: int
 
 
 class Asset(SQLModel, table=True):
@@ -120,20 +122,22 @@ class MarkBuildingBuiltModel(SQLModel):
     is_built: bool = Field(default=True)
 
 
-sqlite_file_name = Path().cwd().joinpath('backend').joinpath('db').joinpath('settlements.db')
-sqlite_url = f'sqlite:///{sqlite_file_name}'
 
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
+DATABASE_URL = getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set")
+
+engine = create_async_engine(DATABASE_URL, pool_pre_ping=True)
 
 
 async def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
 
 
 async def get_session():
-    with Session(engine) as session:
+    async with AsyncSession(engine, expire_on_commit=False) as session:
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
+SessionDep = Annotated[AsyncSession, Depends(get_session)]

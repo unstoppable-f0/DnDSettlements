@@ -25,6 +25,16 @@ function SettlementPage() {
   const [buildings, setBuildings] = useState<Building[]>([])
   const [settlement, setSettlement] = useState<Settlement | null>(null)
 
+  async function fetchList<T>(url: string): Promise<T[]> {
+      try {
+        const response = await fetch(url)
+        if (!response.ok) return []
+        const data = await response.json()
+        return Array.isArray(data) ? data : []
+      } catch {
+        return []
+      }
+    }
 
   function loadAssets() {
       fetch(`/api/assets/${settlementId}`)
@@ -36,20 +46,16 @@ function SettlementPage() {
     loadAssets()
   }, [settlementId])
 
-  function loadEvents() {
-      fetch(`/api/events/unresolved/${settlementId}`)
-      .then(response => response.json())
-      .then(data => setEvents(data))
-  }
+    function loadEvents() {
+      fetchList<Event>(`/api/events/unresolved/${settlementId}`).then(setEvents)
+    }
 
   useEffect(() => {
       loadEvents()
   }, [settlementId])
 
-  function loadResolvedEvents() {
-      fetch(`/api/events/resolved/${settlementId}`)
-          .then(response => response.json())
-          .then(data => setResolvedEvents(data))
+    function loadResolvedEvents() {
+      fetchList<Event>(`/api/events/resolved/${settlementId}`).then(setResolvedEvents)
     }
 
     useEffect(() => {
@@ -57,36 +63,27 @@ function SettlementPage() {
     }, [settlementId]);
 
 
-  function loadChosenResolutions() {
-      const eventIds = resolvedEvents.map(event => event.id)
+function loadChosenResolutions() {
+  if (resolvedEvents.length === 0) {
+    setChosenResolutions([])
+    return
+  }
 
-      if (eventIds.length === 0) {
-        setChosenResolutions([])
-        return
-      }
+  const params = new URLSearchParams()
+  resolvedEvents.forEach(event => params.append('event_ids', String(event.id)))
 
-      const params = new URLSearchParams()
-
-      eventIds.forEach(id => {
-        params.append('event_ids', String(id))
-      })
-
-      fetch(
-        `/api/event_resolutions/many_chosen/?${params.toString()}`
-      )
-        .then(response => response.json())
-        .then(data => setChosenResolutions(data))
-    }
+  fetchList<EventResolution>(
+    `/api/event_resolutions/many_chosen/?${params.toString()}`
+  ).then(setChosenResolutions)
+}
 
   useEffect(() => {
       loadChosenResolutions()
     }, [resolvedEvents])
 
-  function loadBuildings() {
-      fetch(`/api/buildings/settlements/${settlementId}`)
-        .then(response => response.json())
-        .then(data => setBuildings(data))
-  }
+function loadBuildings() {
+  fetchList<Building>(`/api/buildings/settlements/${settlementId}`).then(setBuildings)
+}
 
   useEffect(() => {
       loadBuildings()
@@ -148,6 +145,7 @@ function SettlementPage() {
                 onResolved={() => {
                   loadAssets()
                   loadEvents()
+                  loadResolvedEvents()
                 }}
               />
             ))}
@@ -173,29 +171,28 @@ function SettlementPage() {
 
     {activeTab === 'resolved-events' && (
       <section className="settlement-content">
-        <h2>Resolved Events</h2>
+        <h2>История событий</h2>
 
-        {resolvedEvents.length === 0 ? (
-          <p>No resolved events yet.</p>
-        ) : (
-          resolvedEvents.map(event => {
-            const resolution = chosenResolutions.find(
-              resolution => resolution.event_id === event.id
-            )
+        {(() => {
+          const items = resolvedEvents
+            .map(event => ({
+              event,
+              resolution: chosenResolutions.find(r => r.event_id === event.id),
+            }))
+            .filter(item => item.resolution)
 
-            if (!resolution) {
-              return null
-            }
+          if (items.length === 0) {
+            return <p>Пока нет разрешённых событий.</p>
+          }
 
-            return (
-              <ResolvedEventCard
-                key={event.id}
-                event={event}
-                resolution={resolution}
-              />
-            )
-          })
-        )}
+          return items.map(({ event, resolution }) => (
+            <ResolvedEventCard
+              key={event.id}
+              event={event}
+              resolution={resolution!}
+            />
+          ))
+        })()}
       </section>
     )}
       </main>

@@ -6,6 +6,8 @@ USER root
 RUN groupadd --system --gid 999 beholder \
  && useradd --system --gid 999 --uid 999 --create-home beholder
 
+RUN mkdir -p /data
+
 WORKDIR /app
 COPY . /app
 

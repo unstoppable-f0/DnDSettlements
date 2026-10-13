@@ -18,7 +18,8 @@ async def read_all_event_resolutions(session: SessionDep,
                                      offset: int = 0,
                                      limit: Annotated[int, Query(le=100)] = 100) -> list[EventResolution]:
 
-    all_event_resolutions = session.exec(select(EventResolution).offset(offset).limit(limit)).all()
+    result = await session.exec(select(EventResolution).offset(offset).limit(limit)).all()
+    all_event_resolutions = result.all()
     return all_event_resolutions
 
 
@@ -27,16 +28,18 @@ async def read_event_resolutions_by_id(event_id: int,
                                        offset: int = 0,
                                        limit: Annotated[int, Query(le=100)] = 100) -> list[EventResolution]:
 
-    event_resolutions_by_campaign = session.exec(select(EventResolution).where(EventResolution.event_id == event_id).
-                                           offset(offset).limit(limit)).all()
+    result = await session.exec(select(EventResolution).where(EventResolution.event_id == event_id).
+                                           offset(offset).limit(limit))
+    event_resolutions_by_campaign = result.all()
 
     return event_resolutions_by_campaign
 
 
 async def read_chosen_resolution_by_event_id(event_id: int, session: SessionDep) -> EventResolution:
 
-    chosen_resolution = session.exec(select(EventResolution).where(EventResolution.event_id == event_id)
-                                     .where(EventResolution.chosen == True)).one()
+    result = await session.exec(select(EventResolution).where(EventResolution.event_id == event_id)
+                                     .where(EventResolution.chosen == True))
+    chosen_resolution = result.one()
 
     return chosen_resolution
 
@@ -47,8 +50,9 @@ async def read_many_chosen_resolutions(event_ids: list[int],
                                        limit: Annotated[int, Query(le=100)] = 100
                                        ) -> list[EventResolution]:
 
-    chosen_resolutions = session.exec(select(EventResolution).where(EventResolution.chosen == True)
+    result = await session.exec(select(EventResolution).where(EventResolution.chosen == True)
                             .where(EventResolution.event_id.in_(event_ids)).offset(offset).limit(limit)).all()
+    chosen_resolutions = result.all()
 
 
     return chosen_resolutions
@@ -59,19 +63,19 @@ async def make_event_resolution(event_resolution: CreateEventResolution, session
 
     db_event_resolution = EventResolution.model_validate(event_resolution)
     session.add(db_event_resolution)
-    session.commit()
-    session.refresh(db_event_resolution)
+    await session.commit()
+    await session.refresh(db_event_resolution)
 
     return db_event_resolution
 
 
 async def mark_as_chosen_resolution(event_resolution_id: int, session: SessionDep) -> EventResolution:
-    db_event_resolution = session.get(EventResolution, event_resolution_id)
+    db_event_resolution = await session.get(EventResolution, event_resolution_id)
 
     new_event_resolution_data = ChooseEventResolution().model_dump()
     db_event_resolution.sqlmodel_update(new_event_resolution_data)
-    session.commit()
-    session.refresh(db_event_resolution)
+    await session.commit()
+    await session.refresh(db_event_resolution)
 
     return db_event_resolution
 

@@ -38,7 +38,7 @@ function EventResolutionCard({
         </div>
 
       <button onClick={() => onChoose(resolution)}>
-        Choose
+        Выбрать
       </button>
     </div>
   )
