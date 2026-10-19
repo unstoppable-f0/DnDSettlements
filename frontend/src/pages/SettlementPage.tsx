@@ -108,7 +108,13 @@ function loadBuildings() {
         <header className="settlement-header">
           <h1>{settlement.name}</h1>
 
-          <AssetPanel assets={assets} />
+
+          <AssetPanel
+            assets={assets}
+            settlementId={settlementId!}
+            onAssetsUpdated={setAssets}
+          />
+
         </header>
 
         <nav className="settlement-tabs">

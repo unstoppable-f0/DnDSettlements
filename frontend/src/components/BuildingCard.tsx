@@ -54,7 +54,7 @@ function BuildingCard({
             </div>
 
             {building.is_built ? (
-                <p className="building-status">Built</p>
+                <p className="building-status">Проект завершён</p>
             ) : (
                 <div className="building-actions">
                     <button onClick={handleBuild} disabled={isBuilding}>

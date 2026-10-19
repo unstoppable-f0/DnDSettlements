@@ -1,10 +1,17 @@
 import type { Asset } from '../types/asset'
+import CoffersControls from './CoffersControls'
 
 interface AssetPanelProps {
   assets: Asset
+  settlementId: string
+  onAssetsUpdated: (assets: Asset) => void
 }
 
-function AssetPanel({ assets }: AssetPanelProps) {
+function AssetPanel({
+  assets,
+  settlementId,
+  onAssetsUpdated,
+}: AssetPanelProps) {
   return (
     <section className="asset-panel">
       <h2>Активы поселения</h2>
@@ -17,7 +24,13 @@ function AssetPanel({ assets }: AssetPanelProps) {
 
         <div className="asset-card asset-coffers">
           <span className="asset-label">Казна</span>
+
           <strong>{assets.coffers}</strong>
+
+          <CoffersControls
+            settlementId={settlementId}
+            onUpdated={onAssetsUpdated}
+          />
         </div>
 
         <div className="asset-card asset-resources">

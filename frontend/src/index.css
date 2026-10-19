@@ -454,3 +454,106 @@ button {
 .building-assets {
   grid-template-columns: repeat(2, 1fr);
 }
+
+.coffers-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  justify-content: center;
+}
+
+.coffers-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+
+  border: 2px solid;
+  border-radius: 50%;
+  cursor: pointer;
+
+  box-shadow:
+    inset 0 2px 3px rgb(255 255 255 / 25%),
+    inset 0 -3px 4px rgb(0 0 0 / 20%),
+    0 2px 4px rgb(0 0 0 / 30%);
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.coffers-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+.coffers-button:active {
+  transform: translateY(1px);
+}
+
+.coffers-button-plus {
+  color: #704b08;
+  background: linear-gradient(145deg, #ffe9a0, #d9a52e);
+  border-color: #bd8b20;
+}
+
+.coffers-button-minus {
+  color: #414141;
+  background: linear-gradient(145deg, #eeeeee, #a9a9a9);
+  border-color: #888888;
+}
+
+.coffers-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.coffers-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.coffers-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #242424;
+  color: inherit;
+}
+
+.coffers-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coffers-form-actions button {
+  padding: 7px 12px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.coffers-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.coffers-error {
+  margin: 0;
+  color: #ff7777;
+  font-size: 0.85rem;
+}
