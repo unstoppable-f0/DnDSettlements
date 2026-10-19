@@ -1,0 +1,59 @@
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router'
+import SettlementCard from '../components/SettlementCard'
+
+
+interface Campaign {
+  id: number
+  name: string
+}
+
+interface Settlement {
+  id: number
+  name: string
+  campaign: string
+}
+
+function CampaignPage() {
+  const { campaignId } = useParams()
+
+  const [campaign, setCampaign] = useState<Campaign | null>(null)
+  const [settlements, setSettlements] = useState<Settlement[]>([])
+
+  useEffect(() => {
+    fetch(`/api/campaigns/${campaignId}`)
+      .then(response => response.json())
+      .then(data => setCampaign(data))
+  }, [campaignId])
+
+  useEffect(() => {
+    if (!campaign) {
+      return
+    }
+
+    fetch(`/api/settlements/campaigns/${campaign.id}`)
+      .then(response => response.json())
+      .then(data => setSettlements(data))
+  }, [campaign])
+
+  if (!campaign) {
+    return <p>Загрузка кампании...</p>
+  }
+
+  return (
+    <main>
+      <h1>{campaign.name}</h1>
+
+      <h2>Поселения</h2>
+
+      {settlements.map(settlement => (
+          <SettlementCard
+            key={settlement.id}
+            settlement={settlement}
+          />
+      ))}
+    </main>
+  )
+}
+
+export default CampaignPage

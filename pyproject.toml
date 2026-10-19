@@ -4,13 +4,24 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.14"
 dependencies = [
+    "alembic>=1.20.0",
+    "asyncpg>=0.32.0",
     "fastapi[standard]>=0.141.1",
+    "isort>=9.0.2",
     "sqlmodel>=0.0.46",
 ]
 
 [project.scripts]
 dndsettlements = "dndsettlements:main"
 
+[tool.fastapi]
+entrypoint = "backend.main:app"
+
 [build-system]
 requires = ["uv_build>=0.12.13,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.10",
+]
