@@ -19,9 +19,6 @@ assets_router = APIRouter(
 @assets_router.get('/', response_model=list[Asset])
 async def get_all_assets(session: SessionDep):
     db_all_assets = await read_all_assets(session)
-    if not db_all_assets:
-        raise HTTPException(status_code=404, detail='Assets not found')
-
     return db_all_assets
 
 
@@ -56,3 +53,10 @@ async def make_coffers_donation(settlement_id: int, donated_gold: int, session: 
 async def make_coffers_withdrawal(settlement_id: int, withdrawn_gold: int, session: SessionDep):
     settlement_assets = await withdraw_from_settlement_coffers(settlement_id, withdrawn_gold, session)
     return settlement_assets
+
+
+@assets_router.get('/defence_balance/{settlement_id}', response_model=AssetModel)
+async def get_defence_balance(settlement_id: int, session: SessionDep):
+    """Show all event resolutions that affected the defence parameter of a settlement."""
+
+    ...
