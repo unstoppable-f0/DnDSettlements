@@ -1,25 +1,13 @@
 import { Link } from 'react-router'
-
-interface Settlement {
-  id: number
-  name: string
-  campaign: string
-}
+import type { Settlement } from '../types/settlement'
 
 interface SettlementCardProps {
   settlement: Settlement
 }
 
-function SettlementCard({ settlement }: SettlementCardProps) {
-  return (
-    <div>
-      <h3>{settlement.name}</h3>
-
-      <Link to={`/settlements/${settlement.id}`}>
-        Войти в поселение
-      </Link>
-    </div>
-  )
+export default function SettlementCard({ settlement }: SettlementCardProps) {
+  return <Link to={`/settlements/${settlement.id}`} className="campaign-card">
+    <h3>{settlement.name}</h3>
+    <span className="campaign-card-arrow" aria-hidden="true">↗</span>
+  </Link>
 }
-
-export default SettlementCard

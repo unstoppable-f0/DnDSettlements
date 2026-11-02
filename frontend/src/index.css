@@ -557,3 +557,29 @@ button {
   color: #ff7777;
   font-size: 0.85rem;
 }
+
+.income-button {
+  color: #79500b;
+  background: linear-gradient(145deg, #fff3bc, #e5b747 55%, #be8520);
+  border-color: #c39332;
+  box-shadow:
+    inset 0 0 0 2px #ffe9a0,
+    inset 0 -3px 4px rgb(104 63 0 / 25%),
+    0 2px 4px rgb(0 0 0 / 30%);
+}
+
+.income-button:focus-visible {
+  outline: 2px solid #ffe9a0;
+  outline-offset: 4px;
+}
+
+.income-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.income-control .coffers-error {
+  margin-top: 12px;
+}

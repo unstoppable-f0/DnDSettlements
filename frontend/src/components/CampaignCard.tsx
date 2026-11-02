@@ -1,24 +1,13 @@
 import { Link } from 'react-router'
-
-interface Campaign {
-  id: number
-  name: string
-}
+import type { Campaign } from '../types/campaign'
 
 interface CampaignCardProps {
   campaign: Campaign
 }
 
-function CampaignCard({ campaign }: CampaignCardProps) {
-  return (
-    <div>
-      <h2>{campaign.name}</h2>
-
-      <Link to={`/campaigns/${campaign.id}`}>
-        Перейти к кампании
-      </Link>
-    </div>
-  )
+export default function CampaignCard({ campaign }: CampaignCardProps) {
+  return <Link to={`/campaigns/${campaign.id}`} className="campaign-card">
+    <h2>{campaign.name}</h2>
+    <span className="campaign-card-arrow" aria-hidden="true">↗</span>
+  </Link>
 }
-
-export default CampaignCard

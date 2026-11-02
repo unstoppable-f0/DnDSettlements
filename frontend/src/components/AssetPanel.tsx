@@ -1,10 +1,11 @@
 import type { Asset } from '../types/asset'
 import CoffersControls from './CoffersControls'
+import IncomeControl from './IncomeControl'
 
 interface AssetPanelProps {
   assets: Asset
   settlementId: string
-  onAssetsUpdated: (assets: Asset) => void
+  onAssetsUpdated: (assets: Asset) => void | Promise<void>
 }
 
 function AssetPanel({
@@ -20,6 +21,11 @@ function AssetPanel({
         <div className="asset-card asset-income">
           <span className="asset-label">Доходность</span>
           <strong>{assets.income}</strong>
+          <IncomeControl
+            settlementId={settlementId}
+            income={assets.income}
+            onUpdated={onAssetsUpdated}
+          />
         </div>
 
         <div className="asset-card asset-coffers">

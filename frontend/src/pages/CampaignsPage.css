@@ -1,0 +1,116 @@
+.campaigns-page {
+  box-sizing: border-box;
+  flex: 1;
+  padding: clamp(28px, 6vw, 64px);
+  text-align: left;
+  color: #eeeae2;
+  background: #1c1e1c;
+  color-scheme: dark;
+}
+
+.campaigns-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #363932;
+}
+
+.campaigns-heading h1 {
+  margin: 0;
+  color: #eeeae2;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -.8px;
+  overflow-wrap: anywhere;
+}
+
+.campaigns-count {
+  padding: 2px 9px;
+  border-radius: 6px;
+  background: #2e312b;
+  color: #b7baaF;
+  font-size: 13px;
+}
+
+.campaigns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+}
+
+.campaign-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-width: 0;
+  padding: 26px 24px;
+  border: 1px solid #3a3d35;
+  border-radius: 10px;
+  background: #252823;
+  color: #eeeae2;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.campaign-card h2,
+.campaign-card h3 {
+  margin: 0;
+  color: inherit;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.campaign-card-arrow {
+  flex-shrink: 0;
+  color: #c3aa7a;
+  font-size: 24px;
+}
+
+.campaign-card:hover {
+  border-color: #8e7c58;
+  background: #2d3029;
+}
+
+.campaign-card:focus-visible,
+.campaigns-status button:focus-visible {
+  outline: 2px solid #c3aa7a;
+  outline-offset: 4px;
+}
+
+.campaigns-status:not(:empty) { margin-bottom: 20px; }
+.campaigns-status,
+.campaigns-empty { color: #b7baaf; font-size: 14px; }
+
+.campaigns-status button {
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: 1px solid #70664f;
+  border-radius: 6px;
+  background: #2d3029;
+  color: #eeeae2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaign-card { transition: none; }
+}
+
+.campaigns-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.campaigns-section-heading h2 {
+  margin: 0;
+  color: #eeeae2;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+}
