@@ -1,235 +1,67 @@
-import { useState } from 'react'
+import { useCallback, useId, useRef, useState } from 'react'
 import type { Event } from '../types/event'
-import type { EventResolution, CreateEventResolution } from '../types/eventResolution'
+import { settlementsApi } from '../api/settlements'
+import { useQuery } from '../hooks/useQuery'
+import { useMutation } from '../hooks/useMutation'
 import EventResolutionCard from './EventResolutionCard'
+import CreateResolutionForm from './CreateResolutionForm'
+import QueryStatus from './QueryStatus'
 
-interface EventCardProps {
+interface Props {
   event: Event
-  onResolved: () => void
+  onResolved: () => void | Promise<void>
 }
 
-function EventCard({ event, onResolved }: EventCardProps) {
-  const [resolutions, setResolutions] = useState<EventResolution[]>([])
-  const [showResolutions, setShowResolutions] = useState(false)
-
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [income, setIncome] = useState(0)
-  const [coffers, setCoffers] = useState(0)
-  const [resources, setResources] = useState(0)
-  const [defence, setDefence] = useState(0)
-
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-
-  const [chosenResolution, setChosenResolution] = useState<EventResolution | null>(null)
-
-  const [error, setError] = useState<string | null>(null)
-
-  function handleShowResolutions() {
-    setShowResolutions(true)
-
-    fetch(`/api/event_resolutions/${event.id}`)
-      .then(response => response.json())
-      .then(data => setResolutions(data))
-  }
-
-  function resetCreateForm() {
-  setName('')
-  setDescription('')
-  setIncome(0)
-  setCoffers(0)
-  setResources(0)
-  setDefence(0)
-}
-
-  async function handleChooseResolution(resolution: EventResolution) {
-    setError(null)
-
-    try {
-      const response = await fetch(
-          `/api/event_resolutions/decide/${resolution.id}`,
-          {
-            method: 'PATCH',
-          },
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to decide event resolution')
-      }
-
-
-      setChosenResolution(resolution)
-      onResolved()
-    } catch {
-      setError('Could not apply this resolution. Please try again.')
-    }
-  }
-
-  async function handleCreateResolution() {
-    const newResolution: CreateEventResolution = {
-      event_id: event.id,
-      name,
-      description,
-      income,
-      coffers,
-      resources,
-      defence,
-    }
-
-    try {
-      const response = await fetch(
-        '/api/event_resolutions/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newResolution),
-        },
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to create resolution')
-      }
-
-      const createdResolution: EventResolution = await response.json()
-
-      setResolutions(current => [
-        ...current,
-        createdResolution,
-      ])
-
-      setShowCreateForm(false)
-      resetCreateForm()
-    } catch {
-      setError('Could not create resolution. Please try again.')
-    }
-  }
-
-
-  return (
-    <div className="event-card">
-      <div className="event-header">
-        <h3>{event.name}</h3>
-        <p>{event.description}</p>
-      </div>
-
-      {!showResolutions && (
-        <button onClick={handleShowResolutions}>
-          Избрать решение
-        </button>
-      )}
-
-      {showResolutions && (
-        <div className="event-resolutions">
-          <h4>Вердикты</h4>
-
-          {resolutions.map(resolution => (
-            <EventResolutionCard
-              key={resolution.id}
-              resolution={resolution}
-              onChoose={handleChooseResolution}
-            />
-          ))}
-
-          <button
-            className="secondary-button"
-            onClick={() => setShowCreateForm(true)}
-          >
-            Выбрать свой вариант
-          </button>
-        </div>
-      )}
-
-      {showCreateForm && (
-        <form
-          className="resolution-form"
-          onSubmit={event => {
-            event.preventDefault()
-            handleCreateResolution()
-          }}
-        >
-          <h4>Свой собственный вердикт</h4>
-
-          <label>
-            Название вердикта
-            <input
-              value={name}
-              onChange={event => setName(event.target.value)}
-            />
-          </label>
-
-          <label>
-            Описание
-            <textarea
-              value={description}
-              onChange={event => setDescription(event.target.value)}
-            />
-          </label>
-
-          <div className="resolution-form-assets">
-            <label>
-              Доход
-              <input
-                type="number"
-                value={income}
-                onChange={event => setIncome(Number(event.target.value))}
-              />
-            </label>
-
-            <label>
-              Казна
-              <input
-                type="number"
-                value={coffers}
-                onChange={event => setCoffers(Number(event.target.value))}
-              />
-            </label>
-
-            <label>
-              Рерурсы
-              <input
-                type="number"
-                value={resources}
-                onChange={event => setResources(Number(event.target.value))}
-              />
-            </label>
-
-            <label>
-              Обороноспособность
-              <input
-                type="number"
-                value={defence}
-                onChange={event => setDefence(Number(event.target.value))}
-              />
-            </label>
-          </div>
-
-          <div className="resolution-form-actions">
-            <button type="submit">
-              Создать вердикт
-            </button>
-
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={() => setShowCreateForm(false)}
-            >
-              Отмена
-            </button>
-          </div>
-        </form>
-      )}
-
-      {error && <p role="alert">{error}</p>}
-
-      {chosenResolution && (
-        <p>
-          Selected: {chosenResolution.name}
-        </p>
-      )}
+export default function EventCard({ event, onResolved }: Props) {
+  const [expanded, setExpanded] = useState(false)
+  const [hasOpened, setHasOpened] = useState(false)
+  const resolutionsId = useId()
+  const expandButton = useRef<HTMLButtonElement>(null)
+  return <div className="event-card">
+    <div className="event-header"><h3>{event.name}</h3><p>{event.description}</p></div>
+    <button ref={expandButton} hidden={expanded} aria-expanded={expanded} aria-controls={resolutionsId}
+      onClick={() => { setHasOpened(true); setExpanded(true) }}>Избрать решение</button>
+    <div id={resolutionsId} hidden={!expanded}>
+      {hasOpened && <EventResolutions event={event} onResolved={onResolved} onCollapse={() => {
+        setExpanded(false)
+        // The trigger becomes visible after React commits the collapsed state.
+        requestAnimationFrame(() => expandButton.current?.focus())
+      }} />}
     </div>
-  )
+  </div>
 }
 
-export default EventCard
+function EventResolutions({ event, onResolved, onCollapse }: Props & { onCollapse: () => void }) {
+  const loader = useCallback((signal: AbortSignal) => settlementsApi.resolutions(event.id, signal), [event.id])
+  const query = useQuery(loader)
+  const mutation = useMutation()
+  const [showForm, setShowForm] = useState(false)
+  const [decided, setDecided] = useState(false)
+  const disabled = mutation.pending || decided
+
+  return <div className="event-resolutions">
+    <div className="event-resolutions-heading">
+      <h4>Вердикты:</h4>
+      <button type="button" className="secondary-button" disabled={mutation.pending}
+        onClick={onCollapse}>Скрыть варианты</button>
+    </div>
+    <QueryStatus {...query} onRetry={query.reload} />
+    {query.data?.map(resolution => <EventResolutionCard key={resolution.id} resolution={resolution}
+      disabled={disabled} onChoose={() => void mutation.run(async () => {
+        await settlementsApi.decide(resolution.id)
+        setDecided(true)
+        await onResolved()
+      })} />)}
+    {query.data?.length === 0 && <p>Пока нет вердиктов. Создайте свой вариант.</p>}
+    {decided && <p role="status">Решение принято.</p>}
+    {!showForm && <button className="secondary-button" disabled={disabled || query.loading}
+      onClick={() => setShowForm(true)}>Выбрать свой вариант</button>}
+    {showForm && <CreateResolutionForm eventId={event.id} pending={disabled}
+      onCancel={() => setShowForm(false)} onSubmit={data => void mutation.run(async () => {
+        await settlementsApi.createResolution(data)
+        setShowForm(false)
+        await query.reload()
+      })} />}
+    {mutation.error && <p role="alert">{mutation.error}</p>}
+  </div>
+}

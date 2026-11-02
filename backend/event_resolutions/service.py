@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Query
+from fastapi import Query, HTTPException
 from sqlmodel import select
 
 from backend.assets.service import recalculate_assets
@@ -50,10 +50,11 @@ async def read_many_chosen_resolutions(event_ids: list[int],
                                        limit: Annotated[int, Query(le=100)] = 100
                                        ) -> list[EventResolution]:
 
-    result = await session.exec(select(EventResolution).where(EventResolution.chosen == True)
+    result = await session.exec(select(EventResolution).where(EventResolution.chosen.is_(True))
                             .where(EventResolution.event_id.in_(event_ids)).offset(offset).limit(limit))
     chosen_resolutions = result.all()
-
+    if not chosen_resolutions:
+        raise HTTPException(status_code=404, detail='No event resolutions found for that campaign')
 
     return chosen_resolutions
 

@@ -1,0 +1,98 @@
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  color: #c3aa7a;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.back-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #4d493c;
+  border-radius: 8px;
+  background: #292b25;
+  font-size: 22px;
+}
+
+.back-link:hover .back-link-arrow { border-color: #c3aa7a; background: #35372e; }
+.back-link:focus-visible,
+.settlement-nav-link:focus-visible { outline: 2px solid #c3aa7a; outline-offset: 3px; border-radius: 8px; }
+
+/* Independent drawer: opening it never resizes the settlement content. */
+.settlement-sidebar {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 20;
+  max-width: calc(100vw - 32px);
+  text-align: left;
+  color-scheme: dark;
+}
+
+.settlement-sidebar summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 10px 14px;
+  border: 1px solid #4d493c;
+  border-radius: 8px;
+  background: #252823;
+  color: #c3aa7a;
+  box-shadow: 0 3px 12px #0003;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+}
+
+.settlement-sidebar summary::-webkit-details-marker { display: none; }
+.settlement-sidebar summary:hover { border-color: #c3aa7a; }
+.settlement-sidebar summary:focus-visible { outline: 2px solid #c3aa7a; outline-offset: 3px; }
+.settlement-sidebar-disclosure[open] summary { border-color: #8e7c58; }
+.settlement-sidebar nav {
+  box-sizing: border-box;
+  width: 220px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100svh - 92px);
+  overflow-y: auto;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid #3a3d35;
+  border-radius: 10px;
+  background: #20231f;
+  box-shadow: 0 12px 32px #0005;
+}
+
+.settlement-sidebar h2 { margin: 0 10px 18px; color: #b7baaf; font-size: 13px; font-weight: 500; }
+.settlement-sidebar ul { display: flex; flex-direction: column; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.settlement-sidebar p { font-size: 13px; color: #b7baaf; }
+.settlement-sidebar button { margin: 10px 0; font-size: 13px; }
+.settlement-nav-link { display: block; padding: 10px; border: 1px solid transparent; border-radius: 8px; color: #c2c5bc; font-size: 14px; text-decoration: none; overflow-wrap: anywhere; }
+.settlement-nav-link:hover { background: #2b2f28; color: #eeeae2; }
+.settlement-nav-link.is-active { border-color: #62573f; background: #353329; color: #e2c48c; }
+
+/* Leave room for the toggle when the viewport has no outer left gutter. */
+@media (max-width: 1620px) {
+  .settlement-page { padding-top: 80px; }
+}
+
+.settlement-back-navigation {
+  position: fixed;
+  top: 16px;
+  left: 180px;
+  z-index: 20;
+}
+
+.settlement-back-navigation .back-link {
+  margin: 0;
+  min-height: 42px;
+  padding-right: 10px;
+  border-radius: 8px;
+  background: #252823;
+}

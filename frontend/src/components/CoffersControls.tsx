@@ -1,12 +1,13 @@
 import { useState } from 'react'
+import { settlementsApi, type CoffersOperation } from '../api/settlements'
 import type { Asset } from '../types/asset'
 
 interface CoffersControlsProps {
   settlementId: string
-  onUpdated: (assets: Asset) => void
+  onUpdated: (assets: Asset) => void | Promise<void>
 }
 
-type Operation = 'donation' | 'withdrawal'
+type Operation = CoffersOperation
 
 function CoffersControls({
   settlementId,
@@ -18,6 +19,7 @@ function CoffersControls({
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit() {
+    if (!operation || loading) return
     const gold = Number(amount)
 
     if (!Number.isSafeInteger(gold) || gold <= 0) {
@@ -25,33 +27,12 @@ function CoffersControls({
       return
     }
 
-    const endpoint =
-      operation === 'donation'
-        ? `/api/assets/coffers_donation/${settlementId}`
-        : `/api/assets/coffers_withdrawal/${settlementId}`
-
-    const parameter =
-      operation === 'donation' ? 'donated_gold' : 'withdrawn_gold'
-
     setLoading(true)
     setError('')
 
     try {
-      const response = await fetch(
-        `${endpoint}?${parameter}=${gold}`,
-        { method: 'PATCH' },
-      )
-
-      if (!response.ok) {
-        throw new Error(
-          response.status === 422
-            ? 'Неразумное количество золото или проблемы с сетью.'
-            : `Не удалось: (${response.statusText}).`,
-        )
-      }
-
-      const updatedAssets: Asset = await response.json()
-      onUpdated(updatedAssets)
+      const updatedAssets = await settlementsApi.updateCoffers(settlementId, operation, gold)
+      await onUpdated(updatedAssets)
       setOperation(null)
       setAmount('')
     } catch (err) {
@@ -68,9 +49,10 @@ function CoffersControls({
       <div className="coffers-actions">
         <button
           type="button"
+          disabled={loading}
           className="coffers-button coffers-button-plus"
           aria-label="Donate gold"
-          title="Donate gold"
+          title="Внести золото"
           onClick={() => {
             setOperation('donation')
             setAmount('')
@@ -82,9 +64,10 @@ function CoffersControls({
 
         <button
           type="button"
+          disabled={loading}
           className="coffers-button coffers-button-minus"
           aria-label="Withdraw gold"
-          title="Withdraw gold"
+          title="Забрать золото"
           onClick={() => {
             setOperation('withdrawal')
             setAmount('')
@@ -120,7 +103,7 @@ function CoffersControls({
             />
           </label>
 
-          {error && <p className="coffers-error">{error}</p>}
+          {error && <p role="alert" className="coffers-error">{error}</p>}
 
           <div className="coffers-form-actions">
             <button type="submit" disabled={loading}>

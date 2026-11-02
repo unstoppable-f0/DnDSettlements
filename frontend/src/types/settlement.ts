@@ -1,5 +1,5 @@
 export interface Settlement {
-    id: number;
-    name: string;
-    campaign: string;
+  id: number
+  name: string
+  campaign: number
 }

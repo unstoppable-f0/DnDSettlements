@@ -12,6 +12,8 @@ async def read_all_assets(session: SessionDep,
 
     result = await session.exec(select(Asset).offset(offset).limit(limit))
     db_all_assets = result.all()
+    if not db_all_assets:
+        raise HTTPException(status_code=404, detail='Assets not found')
     return db_all_assets
 
 
@@ -94,3 +96,16 @@ async def recalculate_assets(settlement_id: int, new_assets: AssetModel, session
     updated_assets = await renew_assets_by_settlement_id(settlement_id, recalculated_assets, session)
 
     return updated_assets
+
+
+async def show_defence_balance(settlement_id: int, session: SessionDep) -> Asset:
+    """Take all event resolutions which affected the defence parameter."""
+
+    # 1) Good practice with join?
+    #   a) Take settlement ID
+    #   b) Take all events that were resolved
+    #   c) Take all those resolved events resolutions ONLY WITH defence param (-∞;0) U (0; ∞)
+    # 2) Return it
+
+    ...
+

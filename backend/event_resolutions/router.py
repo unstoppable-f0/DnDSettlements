@@ -47,8 +47,6 @@ async def get_chosen_resolution_by_event_id(event_id: int, session: SessionDep):
 @event_resolutions_router.get('/many_chosen/', response_model=list[EventResolution])
 async def get_many_chosen_resolutions(event_ids: Annotated[list[int] | None, Query()], session: SessionDep):
     chosen_resolutions = await read_many_chosen_resolutions(event_ids, session)
-    if not chosen_resolutions:
-        raise HTTPException(status_code=404, detail='No event resolutions found for that campaign')
     return chosen_resolutions
 
 

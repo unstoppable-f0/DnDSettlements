@@ -2,18 +2,20 @@ import type { EventResolution } from '../types/eventResolution'
 import AssetChange from './AssetChange'
 
 interface EventResolutionCardProps {
+  disabled?: boolean
   resolution: EventResolution
   onChoose: (resolution: EventResolution) => void
 }
 
 function EventResolutionCard({
+  disabled = false,
   resolution,
   onChoose,
 }: EventResolutionCardProps) {
   return (
     <div className="resolution-card">
       <h4>{resolution.name}</h4>
-      <h5>{resolution.description}</h5>
+      <p>{resolution.description}</p>
 
         <div className="resolution-assets">
           <AssetChange
@@ -37,7 +39,7 @@ function EventResolutionCard({
           />
         </div>
 
-      <button onClick={() => onChoose(resolution)}>
+      <button disabled={disabled} onClick={() => onChoose(resolution)}>
         Выбрать
       </button>
     </div>
