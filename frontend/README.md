@@ -1,52 +1,52 @@
 # DnD Settlements frontend
 
-React + TypeScript + Vite client. Routes and the existing Russian interface are preserved by the architecture refactor.
+React, TypeScript, React Router and Vite power the campaign directory and settlement workspace.
 
 ## Development
 
-Use Node 22.15+ (or a newer version supported by the installed Vite release) and npm.
+Run these commands from the frontend directory with Node 22.22 or later and npm.
 
 ```sh
 npm ci
 npm run dev
-npm run build
-npm run lint
-npm test
 ```
 
-The client uses same-origin `/api` URLs. The repository's nginx/Docker configuration routes these to FastAPI. A standalone Vite server needs an equivalent API proxy; this refactor does not change deployment configuration.
+The browser requests the same-origin `/api/` path. Vite forwards it to FastAPI at `http://127.0.0.1:8000` during local development. Set `API_PROXY_TARGET` when starting Vite to use a different backend address. Docker Compose serves the same paths through nginx.
 
-## Responsibilities
+## Where changes belong
 
-- `api/client.ts`: the only `fetch` boundary; HTTP status handling, list-shape validation, and error formatting. It accepts abort signals. Only documented collection endpoints opt into interpreting 404 as an empty list; network errors and other failures remain errors.
-- `api/campaigns.ts`: campaign and campaign-settlement queries.
-- `api/settlements.ts`: settlement queries and mutations, request payloads, query parameters, and settlement snapshot assembly. Independent reads run concurrently; chosen resolutions are fetched after resolved events and joined by event ID.
-- `types/`: shared API models. `Settlement.campaign` is a numeric foreign key, matching FastAPI. Types describe the contract; they do not provide runtime validation of every response field.
-- `hooks/useQuery.ts`: loading/error/data state, cancellation, latest-request protection, retries, and refreshes that retain the last successful data. Pass a stable loader. Route detail components are keyed by route ID so local state resets on navigation.
-- `hooks/useMutation.ts`: pending/error state and a synchronous guard against overlapping submissions. It intentionally does not retry writes.
-- `pages/`: route parameters, page composition, tabs, and refresh coordination.
-- `components/`: cards, panels, request status, and forms. `CreateResolutionForm` owns only its draft and submission callback; `EventResolutions` coordinates resolution queries and commands. Coffers controls retain their small local validation/operation state.
+| Location under `src/` | Responsibility |
+| --- | --- |
+| `App.tsx` | Routes for the campaign list, campaign details and settlement workspace |
+| `api/` | FastAPI models, endpoint paths, request bodies and HTTP errors. Collection endpoints declare when a 404 represents an empty list. |
+| `campaigns/` | Campaign pages, directory links and their styles |
+| `settlement/` | Settlement navigation and tab composition. The assets, buildings and events directories contain their controls and cards. |
+| `settlement/useSettlement.ts` | Settlement commands and the reads affected by each command |
+| `settlement/settlementWrites.ts` | In-flight writes by settlement ID and coordination when reopening a settlement |
+| `hooks/useQuery.ts` | Cancellable reads, explicit retries, refreshes and updates from confirmed writes |
+| `components/` | Shared navigation and request status UI |
 
-Dependency direction: pages/components → hooks/API → shared types. Endpoint strings, HTTP methods, and serialization belong in `api/`, not in JSX. No state-management or data-fetching dependency was added.
+## Settlement data flow
 
-## Refresh policy and errors
+Opening a settlement loads its identity first. The balance, campaign sidebar and active events can then load independently. Buildings and history load on first visit. Expanding an event loads its resolution choices. A failed section offers its own retry. A failed refresh keeps the last successful data visible.
 
-After a settlement mutation, reload the complete settlement snapshot. This keeps assets, buildings, active events, and history consistent with one another and makes invalidation easy to understand. The tradeoff is extra reads compared with targeted invalidation. Consider a query cache if the number of resources or screens grows substantially.
+| Successful command | Update in the UI |
+| --- | --- |
+| Donate, withdraw or collect income | Display the balance returned by the server. |
+| Build a project | Replace the project with the returned building and refresh assets. |
+| Decide an event | Remove the event from the active list, refresh assets and invalidate history. Visible history refreshes immediately. |
+| Create a resolution | Close the draft and reload that event’s choices. |
 
-A refresh error retains the previous snapshot and offers a retry. An initial failure shows an error rather than an endless spinner or a misleading empty list. Successful build/decision actions remain locally marked complete even if the subsequent refresh fails, avoiding an accidental repeat. Missing chosen resolutions are shown explicitly in history instead of silently hiding events.
+One command per settlement can be in flight in this browser tab. Returning to that settlement waits for the pending command before loading its mutable data. After a write error the workspace rereads its visible resources and marks inactive sections for refresh when opened. The backend owns transactionality and coordination between clients.
 
-The snapshot is assembled client-side from multiple requests; it is not a database transaction. The backend remains responsible for transactional writes and idempotency. Cancelling a read prevents an obsolete response from updating the UI; it does not undo a server mutation.
-
-## Extending the application
-
-1. Add or update the shared type to match the backend contract.
-2. Add the endpoint function to the appropriate API module; decide explicitly whether 404 means an empty collection.
-3. Supply a stable loader to `useQuery`, and render `QueryStatus` plus successful and empty states.
-4. Keep form drafts local. Route mutations through the API and refresh their owning page after success.
-5. Add contract/regression tests for changed request or assembly behavior, then run build, lint, and tests.
+For a new settlement action, define the request in `api/`, wire its effects in `useSettlement.ts`, and pass a callback to the control. Keep form drafts in the component. Shared asset fields drive both the resolution form and the displayed effects of projects and decisions.
 
 ## Verification
 
-`tests/api.test.mjs` covers HTTP errors, intentional empty collections, malformed lists, network failures, history joins, abort-signal forwarding, empty-history request avoidance, and mutation methods/payloads. The small Node loader uses the existing TypeScript compiler; no additional test dependency is installed. Type checking is enforced separately by the production build with `strict: true`.
+```sh
+npm test
+npm run lint
+npm run build
+```
 
-The tests mock fetch and do not establish browser interaction behavior or live-backend compatibility. Browser navigation, pending states, retries, and end-to-end mutations should also be checked against a development database before release.
+The Node tests exercise the TypeScript API modules directly. They cover endpoint contracts, missing history entries, cancellation signal forwarding, duplicate submissions and returning to a settlement during successful and failed writes. The production build runs strict TypeScript checking.

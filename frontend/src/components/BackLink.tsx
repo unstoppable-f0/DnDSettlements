@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import './Navigation.css'
+import './BackLink.css'
 
 interface BackLinkProps {
   to: string
@@ -7,8 +7,10 @@ interface BackLinkProps {
 }
 
 export default function BackLink({ to, label }: BackLinkProps) {
-  return <Link className="back-link" to={to}>
-    <span className="back-link-arrow" aria-hidden="true">←</span>
-    {label}
-  </Link>
+  return (
+    <Link className="back-link" to={to}>
+      <span className="back-link-arrow" aria-hidden="true">←</span>
+      {label}
+    </Link>
+  )
 }

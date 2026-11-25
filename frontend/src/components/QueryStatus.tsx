@@ -1,11 +1,18 @@
 interface Props {
   loading: boolean
   error?: string
-  onRetry: () => void
+  reload: () => void
 }
 
-export default function QueryStatus({ loading, error, onRetry }: Props) {
-  if (error) return <div role="alert"><p>{error}</p><button onClick={onRetry}>Повторить загрузку</button></div>
+export default function QueryStatus({ loading, error, reload }: Props) {
+  if (error) {
+    return (
+      <div role="alert">
+        <p>{error}</p>
+        <button type="button" onClick={reload}>Повторить загрузку</button>
+      </div>
+    )
+  }
   if (loading) return <p role="status">Загрузка...</p>
   return null
 }

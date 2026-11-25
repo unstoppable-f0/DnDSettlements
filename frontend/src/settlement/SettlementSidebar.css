@@ -1,36 +1,6 @@
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-  color: #c3aa7a;
-  font-size: 14px;
-  text-decoration: none;
-}
-
-.back-link-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid #4d493c;
-  border-radius: 8px;
-  background: #292b25;
-  font-size: 22px;
-}
-
-.back-link:hover .back-link-arrow { border-color: #c3aa7a; background: #35372e; }
-.back-link:focus-visible,
-.settlement-nav-link:focus-visible { outline: 2px solid #c3aa7a; outline-offset: 3px; border-radius: 8px; }
-
-/* Independent drawer: opening it never resizes the settlement content. */
 .settlement-sidebar {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 20;
-  max-width: calc(100vw - 32px);
+  position: relative;
+  flex-shrink: 0;
   text-align: left;
   color-scheme: dark;
 }
@@ -56,6 +26,9 @@
 .settlement-sidebar summary:focus-visible { outline: 2px solid #c3aa7a; outline-offset: 3px; }
 .settlement-sidebar-disclosure[open] summary { border-color: #8e7c58; }
 .settlement-sidebar nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
   box-sizing: border-box;
   width: 220px;
   max-width: calc(100vw - 32px);
@@ -76,23 +49,4 @@
 .settlement-nav-link { display: block; padding: 10px; border: 1px solid transparent; border-radius: 8px; color: #c2c5bc; font-size: 14px; text-decoration: none; overflow-wrap: anywhere; }
 .settlement-nav-link:hover { background: #2b2f28; color: #eeeae2; }
 .settlement-nav-link.is-active { border-color: #62573f; background: #353329; color: #e2c48c; }
-
-/* Leave room for the toggle when the viewport has no outer left gutter. */
-@media (max-width: 1620px) {
-  .settlement-page { padding-top: 80px; }
-}
-
-.settlement-back-navigation {
-  position: fixed;
-  top: 16px;
-  left: 180px;
-  z-index: 20;
-}
-
-.settlement-back-navigation .back-link {
-  margin: 0;
-  min-height: 42px;
-  padding-right: 10px;
-  border-radius: 8px;
-  background: #252823;
-}
+.settlement-nav-link:focus-visible { outline: 2px solid #c3aa7a; outline-offset: 3px; }

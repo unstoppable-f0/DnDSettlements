@@ -14,8 +14,12 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   return response.json() as Promise<T>
 }
 
-// Only endpoints documented to return 404 for an empty collection opt in.
-export async function requestList<T>(path: string, signal?: AbortSignal, emptyOn404 = false): Promise<T[]> {
+interface ListOptions {
+  signal?: AbortSignal
+  emptyOn404?: boolean
+}
+
+export async function requestList<T>(path: string, { signal, emptyOn404 }: ListOptions = {}): Promise<T[]> {
   try {
     const data = await request<T[]>(path, { signal })
     if (!Array.isArray(data)) throw new Error('Сервер вернул неверный формат списка.')

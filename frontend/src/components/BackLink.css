@@ -1,0 +1,24 @@
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  color: #c3aa7a;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.back-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #4d493c;
+  border-radius: 8px;
+  background: #292b25;
+  font-size: 22px;
+}
+
+.back-link:hover .back-link-arrow { border-color: #c3aa7a; background: #35372e; }
+.back-link:focus-visible { outline: 2px solid #c3aa7a; outline-offset: 3px; border-radius: 8px; }

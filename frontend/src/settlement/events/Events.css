@@ -1,0 +1,43 @@
+.event-resolutions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.event-resolutions > .secondary-button { align-self: center; }
+.event-resolutions h4 { margin: 0; }
+.event-resolutions-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.resolution-card, .resolution-form {
+  border: 1px solid #363632;
+  border-radius: 8px;
+}
+.resolution-card { padding: 16px; background: #1f1f1f; }
+.resolution-card h4 { margin-bottom: 8px; font-weight: 500; }
+.resolution-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 20px;
+  border-color: #444;
+  background: #202020;
+}
+.resolution-form label { display: flex; flex-direction: column; gap: 6px; color: #ccc; font-size: .9rem; }
+.resolution-form input, .resolution-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #181818;
+  color: #eee;
+}
+.resolution-form textarea { min-height: 100px; resize: vertical; }
+.resolution-form-assets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.resolution-form-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+@media (max-width: 700px) {
+  .resolution-form-assets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
